@@ -5,6 +5,10 @@ let idEliminar = null;
 let guardando = false;
 let eliminando = false;
 let cargaActual = 0;
+let generosDisponibles = [];
+let cargaGenerosActual = 0;
+const generosSeleccionados = new Set();
+const sugerenciasGenero = new SugerenciasGenero(document.getElementById('genero'), document.getElementById('sugerenciasGenero'));
 const form = document.getElementById('formularioPista');
 const contenedorPistas = document.getElementById('contenedorPistas');
 const inputBusqueda = document.getElementById('inputBusqueda');
@@ -36,6 +40,7 @@ async function obtenerPistas() {
         if (carga !== cargaActual) return;
         if (!Array.isArray(pistas)) throw new Error('La respuesta del servidor no contiene una lista de pistas.');
         pistasGlobales = pistas;
+        renderizarGeneros();
         filtrarPistas();
     } catch (error) {
         if (carga !== cargaActual) return;
@@ -53,12 +58,13 @@ function estrellas(valor) {
 
 function renderizarPistas(pistas) {
     document.getElementById('totalPistas').textContent = pistasGlobales.length;
+    contenedorPistas.querySelectorAll('audio').forEach(audio => { audio.pause(); audio.removeAttribute('src'); audio.load(); });
     contenedorPistas.replaceChildren();
     if (!pistas.length) {
         const vacio = document.createElement('p');
         vacio.className = 'col-12 text-center text-muted mt-5';
-        vacio.textContent = inputBusqueda.value.trim()
-            ? 'No hay pistas que coincidan con la búsqueda.'
+        vacio.textContent = inputBusqueda.value.trim() || generosSeleccionados.size
+            ? 'No hay pistas que coincidan. Prueba otra búsqueda o limpia los filtros de género.'
             : 'El rack está vacío. Inicia una nueva sesión para comenzar.';
         contenedorPistas.appendChild(vacio);
         return;
@@ -93,13 +99,12 @@ function renderizarPistas(pistas) {
             ['.comentario', pista.comentario || '']
         ]) columna.querySelector(selector).textContent = texto;
         if (typeof pista.archivoAudio === 'string' && pista.archivoAudio.startsWith('/uploads/')) {
-            const audio = document.createElement('audio');
-            audio.controls = true;
-            audio.preload = 'none';
-            audio.className = 'w-100 mt-2 mb-2';
-            audio.src = pista.archivoAudio;
-            audio.setAttribute('aria-label', `Audio de ${pista.titulo}`);
-            columna.querySelector('.audio').appendChild(audio);
+            columna.querySelector('.audio').appendChild(crearReproductor(pista));
+        } else {
+            const sinAudio = document.createElement('p');
+            sinAudio.className = 'sin-audio small text-muted';
+            sinAudio.textContent = 'Sin audio adjunto';
+            columna.querySelector('.audio').appendChild(sinAudio);
         }
         contenedorPistas.appendChild(columna);
     }
@@ -108,6 +113,7 @@ function renderizarPistas(pistas) {
 function filtrarPistas() {
     const texto = inputBusqueda.value.trim().toLocaleLowerCase('es');
     const pistas = pistasGlobales.filter(pista =>
+        (!generosSeleccionados.size || generosSeleccionados.has(claveGenero(pista.genero))) &&
         [pista.titulo, pista.artista].some(valor => String(valor || '').toLocaleLowerCase('es').includes(texto)));
     document.getElementById('btnLimpiarBusqueda').hidden = !inputBusqueda.value;
     renderizarPistas(pistas);
@@ -118,7 +124,67 @@ function limpiarBusqueda() {
     filtrarPistas();
     inputBusqueda.focus();
 }
-inputBusqueda.addEventListener('input', filtrarPistas);
+inputBusqueda.addEventListener('input', event => { if (!event.isComposing) filtrarPistas(); });
+inputBusqueda.addEventListener('compositionend', filtrarPistas);
+
+function renderizarGeneros() {
+    const unicos = new Map();
+    for (const nombre of [...generosDisponibles, ...pistasGlobales.map(pista => pista.genero)]) {
+        if (claveGenero(nombre) && !unicos.has(claveGenero(nombre))) unicos.set(claveGenero(nombre), nombre);
+    }
+    const generos = [...unicos.values()].sort((a, b) => a.localeCompare(b, 'es'));
+    sugerenciasGenero.actualizar(generos);
+    const lista = document.getElementById('listaGeneros');
+    lista.replaceChildren();
+    for (const nombre of generos) {
+        const clave = claveGenero(nombre);
+        const etiqueta = document.createElement('label');
+        etiqueta.className = 'filtro-genero';
+        const casilla = document.createElement('input');
+        casilla.type = 'checkbox';
+        casilla.value = clave;
+        casilla.checked = generosSeleccionados.has(clave);
+        const texto = document.createElement('span');
+        texto.className = 'filtro-nombre';
+        texto.textContent = nombre;
+        const cantidad = document.createElement('span');
+        cantidad.className = 'filtro-cantidad';
+        cantidad.textContent = pistasGlobales.filter(pista => claveGenero(pista.genero) === clave).length;
+        etiqueta.append(casilla, texto, cantidad);
+        lista.appendChild(etiqueta);
+    }
+    document.getElementById('btnLimpiarGeneros').hidden = !generosSeleccionados.size;
+}
+async function obtenerGeneros() {
+    const carga = ++cargaGenerosActual;
+    const estadoGeneros = document.getElementById('estadoGeneros');
+    document.getElementById('btnReintentarGeneros').hidden = true;
+    try {
+        const datos = await solicitar('/api/generos');
+        if (carga !== cargaGenerosActual) return;
+        if (!Array.isArray(datos) || datos.some(nombre => typeof nombre !== 'string')) throw new Error('Lista de géneros inválida');
+        generosDisponibles = datos;
+        estadoGeneros.textContent = datos.length ? '' : 'Los géneros aparecerán al guardar tu primera pista.';
+        renderizarGeneros();
+    } catch {
+        if (carga !== cargaGenerosActual) return;
+        estadoGeneros.textContent = 'No se pudieron cargar todos los géneros. Puedes seguir escribiendo uno al guardar.';
+        document.getElementById('btnReintentarGeneros').hidden = false;
+    }
+}
+document.getElementById('listaGeneros').addEventListener('change', event => {
+    const casilla = event.target;
+    if (casilla.checked) generosSeleccionados.add(casilla.value);
+    else generosSeleccionados.delete(casilla.value);
+    document.getElementById('btnLimpiarGeneros').hidden = !generosSeleccionados.size;
+    filtrarPistas();
+});
+function limpiarGeneros() {
+    generosSeleccionados.clear();
+    renderizarGeneros();
+    filtrarPistas();
+    document.querySelector('#listaGeneros input')?.focus();
+}
 
 function limpiarErrores() {
     mensaje('errorFormulario');
@@ -173,6 +239,7 @@ for (const id of ['modalFormulario', 'modalEliminar', 'modalDetalle']) {
         if ((id === 'modalFormulario' && guardando) || (id === 'modalEliminar' && eliminando)) event.preventDefault();
     });
     elemento.addEventListener('hidden.studio.modal', () => {
+        if (id === 'modalFormulario') sugerenciasGenero.cerrar();
         if (origenModal?.isConnected) origenModal.focus();
         else document.getElementById('btnNuevaPista').focus();
     });
@@ -187,6 +254,7 @@ function nuevaPista() {
     limpiarErrores();
     document.getElementById('comentario').style.height = '';
     document.getElementById('modalTitulo').textContent = 'Nueva Pista';
+    document.getElementById('ayuda-genero').textContent = 'Escribe un género nuevo o elige uno de tu biblioteca.';
     abrirModal(modalFormulario);
 }
 function abrirModalEdicion(id) {
@@ -227,6 +295,7 @@ form.addEventListener('submit', async event => {
     if (guardado) {
         modalFormulario.hide();
         await obtenerPistas();
+        await obtenerGeneros();
     }
 });
 function prepararEliminar(id) {
@@ -271,4 +340,4 @@ function verDetalle(id) {
     })) document.getElementById(campo).textContent = valor;
     abrirModal(modalDetalle);
 }
-document.addEventListener('DOMContentLoaded', obtenerPistas);
+document.addEventListener('DOMContentLoaded', () => { obtenerPistas(); obtenerGeneros(); });

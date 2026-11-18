@@ -15,6 +15,8 @@
 - **Seguimiento de producción:** Composición → Grabación → Mezcla → Masterización → Finalizado.
 - **Audios por pista:** adjunta, reproduce y reemplaza archivos desde la biblioteca.
 - **Búsqueda rápida:** filtra por título o artista y consulta el total de pistas.
+- **Géneros de tu biblioteca:** selecciona una sugerencia o escribe un género nuevo; filtra por uno o varios géneros desde la barra lateral.
+- **Reproductor integrado:** controles de reproducción, pausa, avance y volumen con el estilo de la aplicación.
 - **Valoración y notas:** calificaciones de 1 a 5 y comentarios para cada sesión.
 - **Biblioteca local:** SQLite y copias de audio independientes para cada usuario y equipo.
 - **Interfaz en español:** tema oscuro, acentos naranja y diálogos con navegación por teclado.
@@ -38,6 +40,10 @@ La aplicación instalada incluye su entorno de ejecución: para utilizarla solo 
 - Adjunta un audio para escucharlo desde tu biblioteca.
 - Actualiza la fase de producción, la valoración y los comentarios a medida que avances.
 - Usa la búsqueda para encontrar tus sesiones y edítalas o elimínalas desde el catálogo.
+- Marca géneros en la barra lateral para filtrar tus pistas. Puedes combinarlos con la búsqueda y restablecerlos con **Limpiar**.
+- Al guardar una pista con un género nuevo, este queda disponible como sugerencia para las siguientes sesiones.
+
+Estas mejoras están en la rama `feature/generos-filtros-reproductor`, basada en `dev`. El instalador publicado **1.2.0** corresponde a la versión estable anterior; para probar las mejoras de esta rama utiliza `npm start` desde el código.
 
 Los cambios se guardan en tu equipo. Al cerrar y volver a abrir la aplicación, recuperas tu biblioteca. Los audios que adjuntas se copian a la carpeta de datos de la aplicación; conserva un [respaldo de la biblioteca](docs/datos-locales.md#respaldar-y-restaurar) para trasladarla a otro equipo.
 
@@ -108,6 +114,7 @@ La aplicación de escritorio inicia su API local automáticamente. El modo naveg
 | Método | Ruta | Operación |
 | --- | --- | --- |
 | `GET` | `/api/pistas` | Listar pistas; acepta `?fase=Mezcla` |
+| `GET` | `/api/generos` | Listar los géneros guardados en la biblioteca |
 | `POST` | `/api/pistas` | Crear una pista |
 | `PUT` | `/api/pistas/:id` | Actualizar una pista |
 | `DELETE` | `/api/pistas/:id` | Eliminar una pista y su copia de audio |

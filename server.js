@@ -29,6 +29,10 @@ function crearApp({ dataDir = directorioDatos() } = {}) {
     app.use('/uploads', express.static(biblioteca.uploadsDir, { fallthrough: false }));
     app.get('/estudio.html', (_req, res) => res.redirect(302, '/'));
     app.use(express.static(path.join(__dirname, 'public')));
+    app.get('/api/generos', (_req, res, next) => {
+        try { res.json(biblioteca.listarGeneros()); }
+        catch (error) { next(error); }
+    });
     app.get('/api/pistas', (req, res, next) => {
         try { res.json(biblioteca.listar(typeof req.query.fase === 'string' ? req.query.fase : undefined)); }
         catch (error) { next(error); }

@@ -7,8 +7,8 @@
     "start": "electron .",
     "dev": "node server.js",
     "build": "electron-builder --win",
-    "test:api": "node tests/api.cjs",
-    "test:ui": "electron --no-sandbox tests/ui.cjs",
+    "test:api": "node tests/api.cjs && node tests/generos.cjs",
+    "test:ui": "electron --no-sandbox tests/ui.cjs && electron --no-sandbox tests/generos-ui.cjs",
     "test:desktop": "electron --no-sandbox tests/desktop.cjs"
   },
   "keywords": [],
