@@ -64,8 +64,8 @@ app.whenReady().then(async () => {
         await ejecutar("document.getElementById('btnNuevaPista').click()");
         await esperar("document.getElementById('modalFormulario').classList.contains('show') && document.activeElement.id === 'titulo'");
         await ejecutar("document.getElementById('btnGuardar').click()");
-        assert.equal(await ejecutar('document.activeElement.id'), 'titulo');
-        assert.equal(await ejecutar("document.getElementById('titulo').getAttribute('aria-invalid')"), 'true');
+        assert.equal(await ejecutar('document.activeElement.id'), 'artista');
+        assert.equal(await ejecutar("document.getElementById('artista').getAttribute('aria-invalid')"), 'true');
         assert.equal(peticionesGuardar, 0);
         console.log('OK validación vacía y foco al primer error');
         await ejecutar("document.querySelector('#modalFormulario .btn-secondary').click()");

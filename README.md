@@ -25,20 +25,20 @@ Una vez instalada, la aplicación funciona sin conexión a internet y guarda la 
 
 ## Instalar en Windows
 
-### Descargar la versión 1.3.1
+### Descargar la versión 1.3.2
 
-[**Descargar Gestor de Tracks 1.3.1 para Windows (.exe)**](https://github.com/Hirokinng/gestor-de-tracks/releases/download/v1.3.1/Gestor.de.Tracks.Setup.1.3.1.exe)
+[**Descargar Gestor de Tracks 1.3.2 para Windows (.exe)**](https://github.com/Hirokinng/gestor-de-tracks/releases/download/v1.3.2/Gestor.de.Tracks.Setup.1.3.2.exe)
 
-La **1.3.1** sustituye las estrellas emoji por iconos SVG monocromos con puntuación numérica en el catálogo y el detalle. También incluye el catálogo de géneros con sugerencias, los filtros laterales y el nuevo reproductor. Está publicada como versión de pruebas de la rama `feature/generos-filtros-reproductor`, basada en `dev`, y todavía no está integrada en `main`. Consulta sus [notas y archivos de descarga](https://github.com/Hirokinng/gestor-de-tracks/releases/tag/v1.3.1).
+La **1.3.2** permite dejar el título vacío para usar el nombre del archivo de audio seleccionado, incluida su extensión. Conserva las mejoras anteriores: sustituye las estrellas emoji por iconos SVG monocromos con puntuación numérica en el catálogo y el detalle. También incluye el catálogo de géneros con sugerencias, los filtros laterales y el nuevo reproductor. Está publicada como versión de pruebas de la rama `feature/generos-filtros-reproductor`, basada en `dev`, y todavía no está integrada en `main`. Consulta sus [notas y archivos de descarga](https://github.com/Hirokinng/gestor-de-tracks/releases/tag/v1.3.2).
 
 El instalador generado desde el código de esta versión se encuentra en:
 
 ```text
-release-local-1.3.1/Gestor de Tracks Setup 1.3.1.exe
+release-local-1.3.2/Gestor de Tracks Setup 1.3.2.exe
 ```
 
 1. Si ya utilizas la aplicación, sigue los pasos de [actualización y respaldo](#actualizar-conservando-tu-biblioteca) antes de instalar.
-2. Descarga `Gestor.de.Tracks.Setup.1.3.1.exe` desde el enlace anterior, ejecútalo y completa la instalación.
+2. Descarga `Gestor.de.Tracks.Setup.1.3.2.exe` desde el enlace anterior, ejecútalo y completa la instalación.
 3. Abre **Gestor de Tracks** desde el menú Inicio o su acceso directo.
 4. Comprueba tus pistas anteriores y prueba las sugerencias de género, los filtros y el reproductor.
 
@@ -67,8 +67,8 @@ Las versiones históricas con MongoDB requieren un proceso de migración distint
 
 ## Uso de la aplicación
 
-- Crea una pista con su título, artista y género.
-- Adjunta un audio para escucharlo desde tu biblioteca.
+- Crea una pista con artista y género. El título es opcional: si lo dejas vacío se usará el nombre completo del audio adjunto. Sin título ni audio, una sesión nueva se guarda como **Sin título**.
+- Adjunta un audio para escucharlo desde tu biblioteca. Al editar, puedes conservar un título personalizado; si lo vacías, se usará el nombre original del audio. Para pistas antiguas sin ese dato y sin un archivo nuevo, se conserva el título anterior.
 - Actualiza la fase de producción, la valoración y los comentarios a medida que avances.
 - Usa la búsqueda para encontrar tus sesiones y edítalas o elimínalas desde el catálogo.
 - Marca géneros en la barra lateral para filtrar tus pistas. Puedes combinarlos con la búsqueda y restablecerlos con **Limpiar**.
@@ -99,7 +99,7 @@ npm ci
 npm run build
 ```
 
-3. Encontrarás el instalador en `release-local-1.3.1/Gestor de Tracks Setup 1.3.1.exe`.
+3. Encontrarás el instalador en `release-local-1.3.2/Gestor de Tracks Setup 1.3.2.exe`.
 4. Ejecútalo y abre **Gestor de Tracks** desde el menú Inicio.
 
 El instalador generado se puede copiar a otro equipo Windows para instalar la aplicación sin descargar el código ni sus dependencias por separado. Los ejecutables no se incluyen en el repositorio de código.
@@ -118,7 +118,7 @@ El instalador generado se puede copiar a otro equipo Windows para instalar la ap
 | `npm run verify:release` | Verificar que la versión, el instalador y su enlace de descarga en README coincidan |
 | `npm run test:desktop` | Probar la aplicación empaquetada; requiere compilar primero |
 
-El instalador se genera en `release-local-1.3.1/`. Los ejecutables se distribuyen por GitHub Releases; los ejecutables y las dependencias no se guardan en Git.
+El instalador se genera en `release-local-1.3.2/`. Los ejecutables se distribuyen por GitHub Releases; los ejecutables y las dependencias no se guardan en Git.
 
 ## Estructura
 
@@ -149,7 +149,7 @@ La aplicación de escritorio inicia su API local automáticamente. El modo naveg
 | `PUT` | `/api/pistas/:id` | Actualizar una pista |
 | `DELETE` | `/api/pistas/:id` | Eliminar una pista y su copia de audio |
 
-Los campos son `titulo`, `artista`, `genero`, `fase`, `calificacion` y `comentario`. Para adjuntar audio, envía `multipart/form-data` con el campo `archivoAudio`. Las operaciones sin archivo también aceptan JSON.
+`titulo` es opcional; al omitirse o quedar vacío en una pista nueva se toma el nombre original del archivo adjunto o **Sin título** si no hay audio. `nombreAudio` es un metadato gestionado por el servidor y no un campo editable de la solicitud. Los campos de entrada son `titulo`, `artista`, `genero`, `fase`, `calificacion` y `comentario`. Para adjuntar audio, envía `multipart/form-data` con el campo `archivoAudio`. Las operaciones sin archivo también aceptan JSON.
 
 ## Datos y documentación
 

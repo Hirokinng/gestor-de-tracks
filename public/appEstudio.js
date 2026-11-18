@@ -228,7 +228,7 @@ function validarFormulario() {
     for (const id of campos) {
         const campo = document.getElementById(id);
         let error = '';
-        if (!campo.value.trim()) error = 'Completa este campo.';
+        if (id !== 'titulo' && !campo.value.trim()) error = 'Completa este campo.';
         else if (id === 'fase' && !Array.from(campo.options).some(opcion => opcion.value === campo.value)) error = 'Selecciona una fase válida.';
         else if (id === 'calificacion' && (!Number.isInteger(Number(campo.value)) || Number(campo.value) < 1 || Number(campo.value) > 5)) error = 'Introduce un número entero entre 1 y 5.';
         if (error) {

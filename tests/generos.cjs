@@ -15,12 +15,13 @@ try {
     assert.deepEqual(biblioteca.listarGeneros(), ['Rock']);
     assert.equal(biblioteca.obtener('anterior').genero, '  Rock  ');
     assert.equal(biblioteca.obtener('anterior').archivoAudio, '/uploads/anterior.wav');
+    assert.equal(biblioteca.actualizar('anterior', { titulo: ' ' }).titulo, 'Sesión anterior');
     const datos = { titulo: 'Nueva pista', artista: 'Artista', genero: 'rOcK', calificacion: 3 };
     const pista = biblioteca.crear(datos);
     assert.equal(pista.genero, 'Rock');
     biblioteca.actualizar(pista._id, { genero: '  Lo-Fi   House  ' });
     assert.deepEqual(biblioteca.listarGeneros(), ['Lo-Fi House', 'Rock']);
-    assert.throws(() => biblioteca.crear({ ...datos, genero: 'No guardar', titulo: ' ' }));
+    assert.throws(() => biblioteca.crear({ ...datos, genero: 'No guardar', artista: ' ' }));
     assert.deepEqual(biblioteca.listarGeneros(), ['Lo-Fi House', 'Rock']);
     const unicode = biblioteca.crear({ ...datos, genero: 'Electro\u0301nica' });
     assert.equal(unicode.genero, 'Electrónica');

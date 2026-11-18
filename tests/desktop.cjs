@@ -41,13 +41,13 @@ app.whenReady().then(async () => {
         await win.loadURL(base);
         await esperar("document.getElementById('estadoPistas').textContent === '0 de 0 pistas'");
         await ejecutar(`nuevaPista();
-            for (const [id, valor] of Object.entries({titulo: 'Sesión local', artista: 'Artista de prueba', genero: 'Rock', fase: 'Mezcla', calificacion: '4', comentario: 'Grabada sin internet'})) document.getElementById(id).value = valor;
+            for (const [id, valor] of Object.entries({titulo: '', artista: 'Artista de prueba', genero: 'Rock', fase: 'Mezcla', calificacion: '4', comentario: 'Grabada sin internet'})) document.getElementById(id).value = valor;
             document.getElementById('btnGuardar').click();`);
         await esperar("document.querySelectorAll('[data-pista]').length === 1 && !document.getElementById('modalFormulario').open");
         await new Promise(resolve => setTimeout(resolve, 200));
         fs.writeFileSync(path.join(pruebas, 'desktop-local.png'), (await win.webContents.capturePage()).toPNG());
         const guardadas = await (await fetch(base + '/api/pistas')).json();
-        assert.equal(guardadas[0].titulo, 'Sesión local');
+        assert.equal(guardadas[0].titulo, 'Sin título');
         assert.deepEqual(await (await fetch(base + '/api/generos')).json(), ['Rock']);
         await ejecutar("document.querySelector('[data-pista] button:nth-child(2)').click()");
         await esperar("document.getElementById('modalFormulario').open");

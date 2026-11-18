@@ -22,9 +22,12 @@ function abrirBiblioteca(dataDir = directorioDatos()) {
             genero TEXT NOT NULL,
             fase TEXT NOT NULL CHECK (fase IN ('Composición', 'Grabación', 'Mezcla', 'Masterización', 'Finalizado')),
             calificacion INTEGER NOT NULL CHECK (calificacion BETWEEN 1 AND 5),
-            comentario TEXT NOT NULL DEFAULT '', archivoAudio TEXT
+            comentario TEXT NOT NULL DEFAULT '', archivoAudio TEXT, nombreAudio TEXT
         );
         CREATE TABLE IF NOT EXISTS generos (clave TEXT PRIMARY KEY, nombre TEXT NOT NULL);`);
+    if (!db.prepare('PRAGMA table_info(pistas)').all().some(columna => columna.name === 'nombreAudio')) {
+        db.exec('ALTER TABLE pistas ADD COLUMN nombreAudio TEXT');
+    }
     const normalizarGenero = nombre => nombre.normalize('NFC').trim().replace(/\s+/gu, ' ');
     const guardarGenero = db.prepare('INSERT OR IGNORE INTO generos (clave, nombre) VALUES (?, ?)');
     const buscarGenero = db.prepare('SELECT nombre FROM generos WHERE clave = ?');
@@ -49,8 +52,8 @@ function abrirBiblioteca(dataDir = directorioDatos()) {
         } catch (error) { db.exec('ROLLBACK'); throw error; }
     }
     const porId = db.prepare('SELECT * FROM pistas WHERE _id = ?');
-    const insertar = db.prepare('INSERT INTO pistas (_id, titulo, artista, genero, fase, calificacion, comentario, archivoAudio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-    const actualizar = db.prepare('UPDATE pistas SET titulo = ?, artista = ?, genero = ?, fase = ?, calificacion = ?, comentario = ?, archivoAudio = ? WHERE _id = ?');
+    const insertar = db.prepare('INSERT INTO pistas (_id, titulo, artista, genero, fase, calificacion, comentario, archivoAudio, nombreAudio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    const actualizar = db.prepare('UPDATE pistas SET titulo = ?, artista = ?, genero = ?, fase = ?, calificacion = ?, comentario = ?, archivoAudio = ?, nombreAudio = ? WHERE _id = ?');
     return {
         dataDir,
         uploadsDir: path.join(dataDir, 'uploads'),
@@ -62,19 +65,19 @@ function abrirBiblioteca(dataDir = directorioDatos()) {
                 : db.prepare('SELECT * FROM pistas ORDER BY rowid DESC').all();
         },
         obtener(id) { return porId.get(id); },
-        crear(datos, archivoAudio = null) {
-            const pista = validarPista(datos);
+        crear(datos, archivoAudio = null, nombreAudio) {
+            const pista = validarPista(datos, {}, nombreAudio);
             pista._id = randomUUID();
             pista.archivoAudio = archivoAudio;
-            escribirPista(pista, () => insertar.run(pista._id, pista.titulo, pista.artista, pista.genero, pista.fase, pista.calificacion, pista.comentario, pista.archivoAudio));
+            escribirPista(pista, () => insertar.run(pista._id, pista.titulo, pista.artista, pista.genero, pista.fase, pista.calificacion, pista.comentario, pista.archivoAudio, pista.nombreAudio));
             return porId.get(pista._id);
         },
-        actualizar(id, datos, archivoAudio) {
+        actualizar(id, datos, archivoAudio, nombreAudio) {
             const anterior = porId.get(id);
             if (!anterior) return null;
-            const pista = validarPista(datos, anterior);
+            const pista = validarPista(datos, anterior, nombreAudio);
             if (archivoAudio !== undefined) pista.archivoAudio = archivoAudio;
-            escribirPista(pista, () => actualizar.run(pista.titulo, pista.artista, pista.genero, pista.fase, pista.calificacion, pista.comentario, pista.archivoAudio, id));
+            escribirPista(pista, () => actualizar.run(pista.titulo, pista.artista, pista.genero, pista.fase, pista.calificacion, pista.comentario, pista.archivoAudio, pista.nombreAudio, id));
             return porId.get(id);
         },
         eliminar(id) {

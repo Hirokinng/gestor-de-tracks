@@ -68,11 +68,17 @@ app.whenReady().then(async () => {
         await ejecutar("document.getElementById('genero').dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true}))");
         assert.equal(await ejecutar("document.getElementById('modalFormulario').open"), true);
         assert.equal(await ejecutar("document.getElementById('genero').getAttribute('aria-expanded')"), 'false');
-        await ejecutar(`for (const [id, valor] of Object.entries({titulo:'Sesión nueva', artista:'Artista', genero:'Ambient', calificacion:'5'})) document.getElementById(id).value=valor;
+        assert.equal(await ejecutar("document.getElementById('titulo').required"), false);
+        await ejecutar(`for (const [id, valor] of Object.entries({titulo:'', artista:'Artista', genero:'Ambient', calificacion:'5'})) document.getElementById(id).value=valor;
+            const bytes = Uint8Array.from(atob('${wav.toString('base64')}'), letra => letra.charCodeAt(0));
+            const archivos = new DataTransfer();
+            archivos.items.add(new File([bytes], 'Sesión automática.wav', {type:'audio/wav'}));
+            document.getElementById('archivoAudio').files = archivos.files;
             document.getElementById('genero').dispatchEvent(new Event('input'));
             document.getElementById('btnGuardar').click();`);
         await esperar("document.getElementById('estadoPistas').textContent === '3 de 3 pistas' && document.querySelectorAll('.filtro-genero').length === 3");
         assert.deepEqual(await (await fetch(base + '/api/generos')).json(), ['Ambient', 'Electrónica', 'Rock']);
+        assert.equal(await ejecutar("document.querySelector('[data-pista] .card-title').textContent"), 'Sesión automática.wav');
         await ejecutar("document.querySelector('.reproductor-play').click()");
         await esperar("!document.querySelector('audio').paused && document.querySelector('audio').duration === 3");
         assert.equal(await ejecutar("document.querySelector('.reproductor-progreso').disabled"), false);

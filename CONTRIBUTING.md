@@ -7,7 +7,7 @@ npm ci
 npm start
 ```
 
-Para generar y probar el instalador de Windows, ejecuta `npm run build` y abre el `.exe` de `release-local-1.3.1/`. El modo navegador (`npm run dev`, en `http://127.0.0.1:3000`) queda disponible como alternativa de desarrollo.
+Para generar y probar el instalador de Windows, ejecuta `npm run build` y abre el `.exe` de `release-local-1.3.2/`. El modo navegador (`npm run dev`, en `http://127.0.0.1:3000`) queda disponible como alternativa de desarrollo.
 
 1. Crea una rama descriptiva: `git switch -c mejora/descripcion`.
 2. Mantén el servidor en `server.js`, la persistencia en `storage.js` y la validación en `models/Pista.js`.
