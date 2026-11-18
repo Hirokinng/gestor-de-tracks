@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tracks</title>
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link href="estudio-base.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .navbar-custom {
+            background-color: #0a0a0a !important;
+            border-bottom: 2px solid #ff4500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand-text {
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        .card {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: #ff4500;
+        }
+
+        .metric-card {
+            border-left: 4px solid #ff4500;
+            background: linear-gradient(145deg, #1e1e1e, #151515);
+        }
+
+        .metric-value {
+            color: #ff4500;
+            font-size: 3rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .btn-studio {
+            background-color: #ff4500;
+            color: white;
+            border: none;
+            font-weight: 600;
+            border-radius: 4px;
+            padding: 10px 20px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-studio:hover {
+            background-color: #e03e00;
+            color: white;
+        }
+
+        .badge-fase {
+            background-color: #2a2a2a;
+            color: #ccc;
+            border: 1px solid #444;
+            font-weight: normal;
+        }
+        button { cursor: pointer; }
+        button:disabled { cursor: wait; }
+        :focus-visible { outline: 3px solid #ffb38f; outline-offset: 3px; }
+        .btn-studio:disabled { background-color: #a43710; color: white; }
+        #btnGuardar { min-width: 120px; }
+        #btnConfirmarEliminar { min-width: 130px; }
+        #estadoPistas { min-height: 1.5em; }
+        textarea { overflow-y: auto; }
+        * { scrollbar-color: #777 #1e1e1e; scrollbar-width: auto; }
+        ::-webkit-scrollbar { width: 12px; height: 12px; }
+        ::-webkit-scrollbar-track { background: #1e1e1e; }
+        ::-webkit-scrollbar-thumb { background: #777; border-radius: 6px; }
+        ::-webkit-scrollbar-thumb:hover { background: #999; }
+        ::-webkit-scrollbar-thumb:active { background: #bbb; }
+        @media (forced-colors: active) { * { scrollbar-color: auto; } }
+        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom mb-4 py-3">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1 brand-text">
+                <span style="color: #ff4500;">///</span> AUDIO WORKSPACE
+            </span>
+
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <div class="card metric-card">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase text-muted mb-0" style="font-size: 0.8rem;">Pistas en Rack</h6>
+                            <div class="metric-value" id="totalPistas">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8 text-md-end">
+                <button class="btn btn-studio shadow" id="btnNuevaPista" type="button" onclick="nuevaPista()">
+                    + Nueva Sesión
+                </button>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <label for="inputBusqueda" class="visually-hidden">Buscar pista por título o artista</label>
+                <div class="input-group">
+                <input type="search" id="inputBusqueda" class="form-control bg-dark text-white border-secondary"
+                    placeholder="Buscar pista por título o artista...">
+                <button class="btn btn-outline-light" id="btnLimpiarBusqueda" type="button" onclick="limpiarBusqueda()" hidden aria-label="Limpiar búsqueda">×</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="estadoPistas" role="status" aria-live="polite" class="mb-3"></div>
+        <button id="btnReintentar" class="btn btn-outline-light mb-3" type="button" onclick="obtenerPistas()" hidden>Reintentar</button>
+        <h5 class="text-muted mb-4 border-bottom border-dark pb-2">Catálogo de Proyectos</h5>
+        <div class="row" id="contenedorPistas">
+            <div class="col-12 text-center text-muted mt-5" id="mensajeVacio">
+                <div style="font-size: 3rem; opacity: 0.2; margin-bottom: 10px;">🎙️</div>
+                <p>El rack está vacío. Inicia una nueva sesión para comenzar.</p>
+            </div>
+        </div>
+    </div>
+    <dialog class="modal" id="modalFormulario" aria-labelledby="modalTitulo" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="modalTitulo">Nueva Pista</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="cerrarModal(this)"
+                        aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formularioPista" novalidate>
+                        <div id="errorFormulario" class="alert alert-danger d-none" role="alert" tabindex="-1"></div>
+                        <div class="mb-3">
+                            <label class="form-label" for="titulo">Título de la Pista</label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" id="titulo" aria-describedby="error-titulo"
+                                required>
+                            <div id="error-titulo" class="invalid-feedback"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label" for="artista">Artista / Banda</label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" id="artista" aria-describedby="error-artista"
+                                required>
+                            <div id="error-artista" class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="genero">Género Musical</label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" id="genero" aria-describedby="error-genero"
+                                required placeholder="Ej: Synthwave, Lo-Fi, Metalcore...">
+                            <div id="error-genero" class="invalid-feedback"></div>
+
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="fase">Fase del Proyecto</label>
+                            <select class="form-select bg-dark text-white border-secondary" id="fase" aria-describedby="error-fase" required>
+                                <option value="Composición">Composición</option>
+                                <option value="Grabación">Grabación</option>
+                                <option value="Mezcla">Mezcla</option>
+                                <option value="Masterización">Masterización</option>
+                                <option value="Finalizado">Finalizado</option>
+                            </select>
+                            <div id="error-fase" class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="archivoAudio">Archivo de Audio (Opcional)</label>
+                            <input type="file" class="form-control bg-dark text-white border-secondary"
+                                id="archivoAudio" aria-describedby="error-archivoAudio" accept="audio/*">
+                            <div id="error-archivoAudio" class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="calificacion">Calificación (1 al 5)</label>
+                            <input type="number" class="form-control bg-dark text-white border-secondary"
+                                id="calificacion" aria-describedby="error-calificacion" min="1" max="5" required>
+                            <div id="error-calificacion" class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label" for="comentario">Comentario <span class="text-muted">(opcional)</span></label>
+                            <textarea class="form-control bg-dark text-white border-secondary" id="comentario" rows="4" style="resize: none"
+                                placeholder="Notas sobre la sesión..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal(this)">Cancelar</button>
+                    <button type="submit" form="formularioPista" class="btn btn-studio" id="btnGuardar">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog class="modal" id="modalEliminar" aria-labelledby="tituloEliminar" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-body text-center p-4">
+                    <h5 class="mb-3" id="tituloEliminar">¿Eliminar esta pista?</h5>
+                    <p id="nombreEliminar" class="text-break"></p>
+                    <div id="errorEliminar" class="alert alert-danger d-none" role="alert"></div>
+                    <p class="text-muted text-sm">Esta acción no se puede deshacer.</p>
+                    <button type="button" class="btn btn-secondary me-2" onclick="cerrarModal(this)">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarEliminar" onclick="confirmarEliminar()">Sí, eliminar</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+    <dialog class="modal" id="modalDetalle" aria-labelledby="detalleTitulo" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-white border-secondary">
+                <div class="modal-header border-secondary">
+                    <h5 class="modal-title" id="detalleTitulo"></h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="cerrarModal(this)" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p><span class="text-muted">Artista:</span> <span id="detalleArtista"></span></p>
+                    <p><span class="text-muted">Género:</span> <span id="detalleGenero"></span></p>
+                    <p><span class="text-muted">Fase:</span> <span id="detalleFase"></span></p>
+                    <p><span class="text-muted">Calificación:</span> <span id="detalleCalificacion"></span></p>
+                    <hr class="border-secondary">
+                    <p class="text-muted mb-1">Comentario:</p>
+                    <p id="detalleComentario" class="text-white"></p>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModal(this)">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+    <script src="modal.js"></script>
+    <script src="appEstudio.js"></script>
+</body>
+
+</html>

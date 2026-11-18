@@ -1,0 +1,123 @@
+// Ejecutar con: npm run test:ui. Usa Chromium de Electron y una API en memoria.
+const { app, BrowserWindow } = require('electron');
+app.disableHardwareAcceleration();
+app.commandLine.appendSwitch('in-process-gpu');
+const path = require('node:path');
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const express = require('express');
+app.setPath('userData', path.join(__dirname, '../.tmp-ui/profile'));
+app.setPath('sessionData', path.join(__dirname, '../.tmp-ui/session'));
+let server;
+let win;
+app.whenReady().then(async () => {
+    try {
+        const sitio = express();
+        sitio.use(express.json());
+        let pistas = [{ _id: 'pista1', titulo: '<img src=x onerror="window.inyectado=true">', artista: 'Artista', genero: 'Rock', fase: 'Mezcla', calificacion: 4, comentario: 'Comentario original' }];
+        let falloCarga = false;
+        let falloGuardar = true;
+        let falloEliminar = true;
+        let peticionesGuardar = 0;
+        sitio.get('/api/pistas', (req, res) => falloCarga ? res.status(500).json({ error: 'Fallo simulado' }) : res.json(pistas));
+        sitio.put('/api/pistas/:id', (req, res) => {
+            peticionesGuardar++;
+            setTimeout(() => falloGuardar ? res.status(400).json({ error: 'Datos rechazados de prueba' }) : res.json({ _id: req.params.id }), 250);
+        });
+        sitio.delete('/api/pistas/:id', (req, res) => {
+            if (falloEliminar) return res.status(500).json({ error: 'Fallo simulado' });
+            pistas = [];
+            res.json({ mensaje: 'Pista eliminada' });
+        });
+        sitio.use(express.static(path.join(__dirname, '../public')));
+        server = sitio.listen(0, '127.0.0.1');
+        await new Promise(resolve => server.once('listening', resolve));
+        win = new BrowserWindow({ show: false, width: 1200, height: 800, webPreferences: { nodeIntegration: false, contextIsolation: true } });
+        const ejecutar = code => win.webContents.executeJavaScript(code);
+        const esperar = async condicion => {
+            const inicio = Date.now();
+            while (!await ejecutar(condicion)) {
+                if (Date.now() - inicio > 8000) throw new Error(`Tiempo agotado: ${condicion}`);
+                await new Promise(resolve => setTimeout(resolve, 60));
+            }
+        };
+        const base = `http://127.0.0.1:${server.address().port}`;
+        const externos = [];
+        win.webContents.session.webRequest.onBeforeRequest({urls: ['*://*/*']}, (details, callback) => {
+            const externo = !details.url.startsWith(base + '/');
+            if (externo) externos.push(details.url);
+            callback({cancel: externo});
+        });
+        await win.loadURL(base);
+        await esperar("document.querySelectorAll('[data-pista]').length === 1");
+        assert.equal(await ejecutar('Boolean(window.inyectado)'), false);
+        assert.equal(await ejecutar("document.querySelector('.card-title img')"), null);
+        console.log('OK contenido seguro y carga inicial');
+        await ejecutar("document.getElementById('btnNuevaPista').click()");
+        await esperar("document.getElementById('modalFormulario').classList.contains('show') && document.activeElement.id === 'titulo'");
+        await ejecutar("document.getElementById('btnGuardar').click()");
+        assert.equal(await ejecutar('document.activeElement.id'), 'titulo');
+        assert.equal(await ejecutar("document.getElementById('titulo').getAttribute('aria-invalid')"), 'true');
+        assert.equal(peticionesGuardar, 0);
+        console.log('OK validación vacía y foco al primer error');
+        await ejecutar("document.querySelector('#modalFormulario .btn-secondary').click()");
+        await esperar("!document.getElementById('modalFormulario').classList.contains('show') && !document.querySelector('.modal-backdrop')");
+        await ejecutar("document.querySelector('[data-pista] button:nth-child(2)').focus(); document.querySelector('[data-pista] button:nth-child(2)').click()");
+        await esperar("document.getElementById('modalFormulario').classList.contains('show')");
+        assert.equal(await ejecutar("document.getElementById('genero').value"), 'Rock');
+        assert.equal(await ejecutar("document.getElementById('comentario').value"), 'Comentario original');
+        await ejecutar("document.getElementById('calificacion').value = '2.5'; document.getElementById('btnGuardar').click()");
+        assert.equal(await ejecutar('document.activeElement.id'), 'calificacion');
+        assert.equal(peticionesGuardar, 0);
+        await ejecutar("document.getElementById('calificacion').value = '4'; document.getElementById('btnGuardar').click(); document.getElementById('formularioPista').dispatchEvent(new Event('submit', {cancelable:true}))");
+        await esperar("!document.getElementById('errorFormulario').classList.contains('d-none')");
+        assert.equal(peticionesGuardar, 1);
+        assert.equal(await ejecutar("document.getElementById('comentario').value"), 'Comentario original');
+        assert.equal(await ejecutar("document.getElementById('modalFormulario').classList.contains('show')"), true);
+        assert.equal(await ejecutar("document.getElementById('btnGuardar').disabled"), false);
+        console.log('OK edición completa, calificación, bloqueo de duplicados y recuperación del error al guardar');
+        falloGuardar = false;
+        await ejecutar("document.getElementById('btnGuardar').click()");
+        await esperar("!document.getElementById('modalFormulario').classList.contains('show') && !document.querySelector('.modal-backdrop')");
+        console.log('OK reintento de guardado satisfactorio');
+        await ejecutar("inputBusqueda.value='no-existe'; inputBusqueda.dispatchEvent(new Event('input'))");
+        assert.equal(await ejecutar("document.querySelectorAll('[data-pista]').length"), 0);
+        assert.equal(await ejecutar("document.getElementById('totalPistas').textContent"), '1');
+        await ejecutar("document.getElementById('btnLimpiarBusqueda').click()");
+        assert.equal(await ejecutar('document.activeElement.id'), 'inputBusqueda');
+        assert.equal(await ejecutar("document.querySelectorAll('[data-pista]').length"), 1);
+        console.log('OK búsqueda vacía, contador total y limpieza');
+        falloCarga = true;
+        await ejecutar('obtenerPistas()');
+        assert.equal(await ejecutar("document.getElementById('btnReintentar').hidden"), false);
+        falloCarga = false;
+        await ejecutar("document.getElementById('btnReintentar').click()");
+        await esperar("document.getElementById('estadoPistas').textContent === '1 de 1 pistas'");
+        console.log('OK fallo de carga y reintento');
+        await ejecutar("document.querySelector('[data-pista] button:last-child').click()");
+        await esperar("document.getElementById('modalEliminar').classList.contains('show') && document.activeElement.textContent === 'Cancelar'");
+        await ejecutar("document.getElementById('btnConfirmarEliminar').click()");
+        await esperar("!document.getElementById('errorEliminar').classList.contains('d-none')");
+        assert.equal(await ejecutar("document.getElementById('modalEliminar').classList.contains('show')"), true);
+        assert.equal(await ejecutar("document.querySelectorAll('[data-pista]').length"), 1);
+        falloEliminar = false;
+        await ejecutar("document.getElementById('btnConfirmarEliminar').click()");
+        await esperar("document.getElementById('totalPistas').textContent === '0' && !document.querySelector('.modal-backdrop')");
+        console.log('OK eliminación fallida, reintento y catálogo vacío');
+        win.setSize(390, 844);
+        assert.equal(await ejecutar('document.documentElement.scrollWidth <= window.innerWidth'), true);
+        console.log('OK ancho móvil sin desbordamiento horizontal');
+        fs.mkdirSync(path.join(__dirname, '../.tmp-ui'), { recursive: true });
+        fs.writeFileSync(path.join(__dirname, '../.tmp-ui/mobile.png'), (await win.webContents.capturePage()).toPNG());
+        assert.deepEqual(externos, [], 'La app no solicita recursos externos');
+        console.log('Pruebas de interfaz local completadas sin acceso a internet');
+        win.destroy();
+        server.close();
+        app.exit(0);
+    } catch (error) {
+        console.error(error);
+        win?.destroy();
+        server?.close();
+        app.exit(1);
+    }
+});

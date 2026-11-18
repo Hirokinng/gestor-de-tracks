@@ -1,0 +1,58 @@
+{
+  "name": "gestor-de-tracks",
+  "version": "1.2.0",
+  "description": "Gestor de Tracks: biblioteca local de sesiones y audios",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "node server.js",
+    "build": "electron-builder --win",
+    "test:api": "node tests/api.cjs",
+    "test:ui": "electron --no-sandbox tests/ui.cjs",
+    "test:desktop": "electron --no-sandbox tests/desktop.cjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "multer": "^2.1.1"
+  },
+  "devDependencies": {
+    "electron": "^41.2.1",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.hirostudio.app",
+    "productName": "Gestor de Tracks",
+    "files": [
+      "main.js",
+      "server.js",
+      "storage.js",
+      "models/**",
+      "public/**",
+      "!public/uploads/**",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/icon.ico"
+    },
+    "directories": {
+      "output": "release-local-1.2.0"
+    },
+    "nsis": {
+      "include": "build/installer.nsh",
+      "installerIcon": "public/icon.ico",
+      "uninstallerIcon": "public/icon.ico",
+      "installerHeaderIcon": "public/icon.ico",
+      "shortcutName": "Gestor de Tracks",
+      "uninstallDisplayName": "Gestor de Tracks",
+      "deleteAppDataOnUninstall": false
+    }
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

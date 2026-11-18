@@ -1,0 +1,31 @@
+# Dependencias y cachés
+node_modules/
+.npm-cache/
+.tmp-ui/
+*.log
+
+# Credenciales y configuración local
+.env
+.env.*
+!.env.example
+
+# Bibliotecas personales y archivos de audio
+/migracion-personal/
+/public/uploads/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+
+# Instaladores y compilaciones (build/ contiene fuentes del instalador)
+/dist/
+/release-local-*/
+
+# Informes de herramientas locales
+/premium-audit.json
+/premium-ui.json
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+Desktop.ini
