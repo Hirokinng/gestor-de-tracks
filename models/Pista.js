@@ -2,9 +2,13 @@ const FASES = ['Composición', 'Grabación', 'Mezcla', 'Masterización', 'Finali
 class ErrorValidacion extends Error {
     constructor(message) { super(message); this.status = 400; }
 }
-function validarPista(datos = {}, anterior = {}) {
+function validarPista(datos = {}, anterior = {}, nombreAudio) {
     const pista = {};
-    for (const [campo, etiqueta] of [['titulo', 'título'], ['artista', 'artista'], ['genero', 'género']]) {
+    pista.nombreAudio = nombreAudio ?? anterior.nombreAudio ?? null;
+    const titulo = datos.titulo ?? anterior.titulo ?? '';
+    if (typeof titulo !== 'string') throw new ErrorValidacion('El título debe ser texto.');
+    pista.titulo = titulo.trim() || pista.nombreAudio || anterior.titulo || 'Sin título';
+    for (const [campo, etiqueta] of [['artista', 'artista'], ['genero', 'género']]) {
         const valor = datos[campo] ?? anterior[campo];
         if (typeof valor !== 'string' || !valor.trim()) throw new ErrorValidacion(`El ${etiqueta} es obligatorio.`);
         pista[campo] = valor.trim();

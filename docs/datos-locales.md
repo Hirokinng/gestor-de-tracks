@@ -26,6 +26,23 @@ La biblioteca se guarda fuera de la carpeta de instalación y se conserva al act
 
 La restauración reemplaza la biblioteca de destino; no combina catálogos. Copiar solo la base de datos no incluye los audios.
 
+## Actualizar desde la versión 1.2.0
+
+La versión **1.3.2**, desarrollada en `feature/generos-filtros-reproductor`, reutiliza la biblioteca SQLite de las versiones 1.2.0 y 1.3.0. Conserva las pistas, referencias a los audios, fases, comentarios y calificaciones; al abrirla, crea el catálogo de géneros a partir de las pistas existentes sin reescribirlas ni mover sus audios. El cambio de representación visual de las calificaciones no modifica sus valores guardados.
+
+Antes de instalar, cierra la aplicación y copia la carpeta completa `%LOCALAPPDATA%\EstudioHiro` a una ubicación de respaldo. Después ejecuta el nuevo instalador y abre Gestor de Tracks desde su acceso directo. No hace falta desinstalar la versión anterior.
+
+La aplicación y su biblioteca tienen ubicaciones distintas:
+
+| Ubicación predeterminada | Finalidad |
+| --- | --- |
+| `%LOCALAPPDATA%\Programs\Gestor de Tracks` | Archivos de la aplicación que sustituye el instalador |
+| `%LOCALAPPDATA%\EstudioHiro` | Biblioteca y datos que se conservan al actualizar |
+
+La versión estable y la feature usan la misma identidad de aplicación y la misma carpeta de datos para el mismo usuario de Windows. La carpeta que contiene el instalador no determina la ubicación de la biblioteca. Si utilizas `ESTUDIO_HIRO_DATA_DIR`, respalda la ruta configurada y mantén esa variable al abrir la nueva versión.
+
+Para probar la feature con una biblioteca separada, utiliza el arranque desde el código con la configuración de la siguiente sección. Las bibliotecas históricas con MongoDB no se importan automáticamente; consulta [Versiones anteriores](#versiones-anteriores).
+
 ## Bibliotecas de desarrollo
 
 Puedes definir `ESTUDIO_HIRO_DATA_DIR` con una ruta absoluta para mantener una biblioteca independiente. Ejemplo en PowerShell:

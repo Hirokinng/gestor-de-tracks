@@ -18,10 +18,10 @@ async function cerrar(server) {
     servidores.delete(server);
 }
 const datos = { titulo: 'Prueba local', artista: 'Artista', genero: 'Rock', fase: 'Mezcla', calificacion: 4, comentario: 'Original' };
-function formulario(campos, audio) {
+function formulario(campos, audio, nombre = 'sesion.wav') {
     const form = new FormData();
     for (const [key, value] of Object.entries(campos)) form.append(key, value);
-    if (audio) form.append('archivoAudio', new Blob([audio], { type: 'audio/wav' }), 'sesion.wav');
+    if (audio) form.append('archivoAudio', new Blob([audio], { type: 'audio/wav' }), nombre);
     return form;
 }
 async function json(base, ruta, method, body) {
@@ -30,13 +30,13 @@ async function json(base, ruta, method, body) {
 (async () => {
     try {
         let a = await abrir(dispositivoA);
-        const b = await abrir(dispositivoB);
+        let b = await abrir(dispositivoB);
         assert.equal(a.server.address().address, '127.0.0.1');
         assert.deepEqual(await (await fetch(a.base + '/api/pistas')).json(), []);
         const original = path.join(raiz, 'original.wav');
         const audio = Buffer.from('RIFF-audio-local-de-prueba');
         fs.writeFileSync(original, audio);
-        let respuesta = await fetch(a.base + '/api/pistas', { method: 'POST', body: formulario({ ...datos, titulo: ' ' }, audio) });
+        let respuesta = await fetch(a.base + '/api/pistas', { method: 'POST', body: formulario({ ...datos, artista: ' ' }, audio) });
         assert.equal(respuesta.status, 400);
         assert.equal(fs.readdirSync(path.join(dispositivoA, 'uploads')).length, 0);
         respuesta = await fetch(a.base + '/api/pistas', { method: 'POST', body: formulario(datos, fs.readFileSync(original)) });
@@ -93,6 +93,41 @@ async function json(base, ruta, method, body) {
         assert.equal(fs.readdirSync(path.join(dispositivoA, 'uploads')).length, 0);
         assert.deepEqual(await (await fetch(b.base + '/api/pistas')).json(), []);
         console.log('OK reemplazo y limpieza de audios, fallos sin archivos huérfanos y originales conservados');
+        respuesta = await json(b.base, '/api/pistas', 'POST', { ...datos, titulo: undefined, nombreAudio: 'Nombre no confiable.wav' });
+        assert.equal(respuesta.status, 201);
+        let automatica = await respuesta.json();
+        assert.equal(automatica.titulo, 'Sin título');
+        assert.equal(automatica.nombreAudio, null);
+        await fetch(b.base + '/api/pistas/' + automatica._id, { method: 'DELETE' });
+        for (const [titulo, nombre] of [['   ', 'Sesión de prueba.wav'], [undefined, 'Mezcla final.wav']]) {
+            const campos = { ...datos };
+            if (titulo === undefined) delete campos.titulo;
+            else campos.titulo = titulo;
+            respuesta = await fetch(b.base + '/api/pistas', { method: 'POST', body: formulario(campos, audio, nombre) });
+            assert.equal(respuesta.status, 201);
+            automatica = await respuesta.json();
+            assert.equal(automatica.titulo, nombre);
+            assert.equal(automatica.nombreAudio, nombre);
+            respuesta = await json(b.base, '/api/pistas/' + automatica._id, 'PUT', { titulo: ' ' });
+            assert.equal((await respuesta.json()).titulo, nombre);
+            respuesta = await json(b.base, '/api/pistas/' + automatica._id, 'PUT', { titulo: 'Nombre personalizado' });
+            assert.equal((await respuesta.json()).titulo, 'Nombre personalizado');
+            respuesta = await fetch(b.base + '/api/pistas/' + automatica._id, { method: 'PUT', body: formulario({}, audio, 'Reemplazo.wav') });
+            assert.equal((await respuesta.json()).titulo, 'Nombre personalizado');
+            respuesta = await fetch(b.base + '/api/pistas/' + automatica._id, { method: 'PUT', body: formulario({ titulo: '' }, audio, 'Otra versión.wav') });
+            const reemplazada = await respuesta.json();
+            assert.equal(reemplazada.titulo, 'Otra versión.wav');
+            assert.equal(reemplazada.nombreAudio, 'Otra versión.wav');
+            assert.equal(await (await fetch(b.base + reemplazada.archivoAudio)).text(), audio.toString());
+            await cerrar(b.server);
+            b = await abrir(dispositivoB);
+            const persistida = (await (await fetch(b.base + '/api/pistas')).json()).find(item => item._id === automatica._id);
+            assert.equal(persistida.titulo, 'Otra versión.wav');
+            assert.equal(persistida.nombreAudio, 'Otra versión.wav');
+            await fetch(b.base + '/api/pistas/' + automatica._id, { method: 'DELETE' });
+        }
+        assert.equal(fs.readdirSync(path.join(dispositivoB, 'uploads')).length, 0);
+        console.log('OK título opcional: nombre original con espacios y acentos, sin audio, edición, reemplazo y título personalizado');
     } catch (error) {
         console.error(error);
         process.exitCode = 1;

@@ -27,3 +27,5 @@ jobs:
         run: npm ci
       - name: Probar API y bibliotecas independientes
         run: npm run test:api
+      - name: Verificar versión y enlace de descarga documentado
+        run: npm run verify:release

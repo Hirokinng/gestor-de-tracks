@@ -15,6 +15,8 @@
 - **Seguimiento de producción:** Composición → Grabación → Mezcla → Masterización → Finalizado.
 - **Audios por pista:** adjunta, reproduce y reemplaza archivos desde la biblioteca.
 - **Búsqueda rápida:** filtra por título o artista y consulta el total de pistas.
+- **Géneros de tu biblioteca:** selecciona una sugerencia o escribe un género nuevo; filtra por uno o varios géneros desde la barra lateral.
+- **Reproductor integrado:** controles de reproducción, pausa, avance y volumen con el estilo de la aplicación.
 - **Valoración y notas:** calificaciones de 1 a 5 y comentarios para cada sesión.
 - **Biblioteca local:** SQLite y copias de audio independientes para cada usuario y equipo.
 - **Interfaz en español:** tema oscuro, acentos naranja y diálogos con navegación por teclado.
@@ -23,21 +25,54 @@ Una vez instalada, la aplicación funciona sin conexión a internet y guarda la 
 
 ## Instalar en Windows
 
+### Descargar la versión 1.3.2
+
+[**Descargar Gestor de Tracks 1.3.2 para Windows (.exe)**](https://github.com/Hirokinng/gestor-de-tracks/releases/download/v1.3.2/Gestor.de.Tracks.Setup.1.3.2.exe)
+
+La **1.3.2** permite dejar el título vacío para usar el nombre del archivo de audio seleccionado, incluida su extensión. Conserva las mejoras anteriores: sustituye las estrellas emoji por iconos SVG monocromos con puntuación numérica en el catálogo y el detalle. También incluye el catálogo de géneros con sugerencias, los filtros laterales y el nuevo reproductor. Está publicada como versión de pruebas de la rama `feature/generos-filtros-reproductor`, basada en `dev`, y todavía no está integrada en `main`. Consulta sus [notas y archivos de descarga](https://github.com/Hirokinng/gestor-de-tracks/releases/tag/v1.3.2).
+
+El instalador generado desde el código de esta versión se encuentra en:
+
+```text
+release-local-1.3.2/Gestor de Tracks Setup 1.3.2.exe
+```
+
+1. Si ya utilizas la aplicación, sigue los pasos de [actualización y respaldo](#actualizar-conservando-tu-biblioteca) antes de instalar.
+2. Descarga `Gestor.de.Tracks.Setup.1.3.2.exe` desde el enlace anterior, ejecútalo y completa la instalación.
+3. Abre **Gestor de Tracks** desde el menú Inicio o su acceso directo.
+4. Comprueba tus pistas anteriores y prueba las sugerencias de género, los filtros y el reproductor.
+
+El instalador incluye el entorno de ejecución. Si prefieres trabajar con el código, puedes [generar el instalador](#generar-el-instalador-desde-el-código) o abrir la aplicación con `npm start`.
+
+### Versión estable anterior: 1.2.0
+
 [**Descargar Gestor de Tracks 1.2.0 para Windows (.exe)**](https://github.com/Hirokinng/gestor-de-tracks/releases/download/v1.2.0/Gestor.de.Tracks.Setup.1.2.0.exe)
 
-1. Descarga `Gestor.de.Tracks.Setup.1.2.0.exe` desde el enlace anterior o desde [GitHub Releases](https://github.com/Hirokinng/gestor-de-tracks/releases/latest).
-2. Ejecuta el instalador y completa la instalación.
-3. Abre **Gestor de Tracks** desde el menú Inicio o su acceso directo.
-4. Crea tu primera pista y adjunta un audio desde la aplicación.
+Este enlace descarga la versión estable anterior, que todavía no incluye las mejoras de esta feature.
 
 La aplicación instalada incluye su entorno de ejecución: para utilizarla solo necesitas Windows. No requiere instalar Node.js, npm o Git, abrir una terminal ni configurar una base de datos.
 
+## Actualizar conservando tu biblioteca
+
+Al actualizar desde la versión **1.2.0 con SQLite**, se conservan tus pistas y proyectos, audios, fases, comentarios y calificaciones. La biblioteca se guarda fuera de la carpeta de instalación, en `%LOCALAPPDATA%\EstudioHiro`, y la feature reutiliza esa misma ubicación para el mismo usuario de Windows. Los géneros de tus pistas existentes aparecen automáticamente en las sugerencias y los filtros.
+
+1. Cierra Gestor de Tracks antes de actualizar.
+2. Abre `%LOCALAPPDATA%` desde el Explorador de archivos y copia la carpeta completa `EstudioHiro` a otra ubicación como respaldo.
+3. Ejecuta el nuevo instalador. No necesitas desinstalar la versión anterior.
+4. Abre la aplicación y verifica tu biblioteca antes de continuar trabajando.
+
+El instalador actualiza la misma aplicación. La versión estable y la feature comparten la biblioteca por defecto. Si quieres probar con datos independientes, consulta [Bibliotecas de desarrollo](docs/datos-locales.md#bibliotecas-de-desarrollo). Si has configurado `ESTUDIO_HIRO_DATA_DIR`, conserva esa configuración y respalda la carpeta indicada por ella.
+
+Las versiones históricas con MongoDB requieren un proceso de migración distinto: consulta [Versiones anteriores](docs/datos-locales.md#versiones-anteriores).
+
 ## Uso de la aplicación
 
-- Crea una pista con su título, artista y género.
-- Adjunta un audio para escucharlo desde tu biblioteca.
+- Crea una pista con artista y género. El título es opcional: si lo dejas vacío se usará el nombre completo del audio adjunto. Sin título ni audio, una sesión nueva se guarda como **Sin título**.
+- Adjunta un audio para escucharlo desde tu biblioteca. Al editar, puedes conservar un título personalizado; si lo vacías, se usará el nombre original del audio. Para pistas antiguas sin ese dato y sin un archivo nuevo, se conserva el título anterior.
 - Actualiza la fase de producción, la valoración y los comentarios a medida que avances.
 - Usa la búsqueda para encontrar tus sesiones y edítalas o elimínalas desde el catálogo.
+- Marca géneros en la barra lateral para filtrar tus pistas. Puedes combinarlos con la búsqueda y restablecerlos con **Limpiar**.
+- Al guardar una pista con un género nuevo, este queda disponible como sugerencia para las siguientes sesiones.
 
 Los cambios se guardan en tu equipo. Al cerrar y volver a abrir la aplicación, recuperas tu biblioteca. Los audios que adjuntas se copian a la carpeta de datos de la aplicación; conserva un [respaldo de la biblioteca](docs/datos-locales.md#respaldar-y-restaurar) para trasladarla a otro equipo.
 
@@ -64,7 +99,7 @@ npm ci
 npm run build
 ```
 
-3. Encontrarás el instalador en `release-local-1.2.0/Gestor de Tracks Setup 1.2.0.exe`.
+3. Encontrarás el instalador en `release-local-1.3.2/Gestor de Tracks Setup 1.3.2.exe`.
 4. Ejecútalo y abre **Gestor de Tracks** desde el menú Inicio.
 
 El instalador generado se puede copiar a otro equipo Windows para instalar la aplicación sin descargar el código ni sus dependencias por separado. Los ejecutables no se incluyen en el repositorio de código.
@@ -80,9 +115,10 @@ El instalador generado se puede copiar a otro equipo Windows para instalar la ap
 | `npm run test:api` | Probar validación, SQLite, audios, reinicios y aislamiento entre bibliotecas |
 | `npm run test:ui` | Probar la interfaz en Electron con una API simulada y sin peticiones externas |
 | `npm run build` | Generar el instalador de Windows con electron-builder |
+| `npm run verify:release` | Verificar que la versión, el instalador y su enlace de descarga en README coincidan |
 | `npm run test:desktop` | Probar la aplicación empaquetada; requiere compilar primero |
 
-El instalador se genera en `release-local-1.2.0/`. Los ejecutables y las dependencias no se guardan en Git.
+El instalador se genera en `release-local-1.3.2/`. Los ejecutables se distribuyen por GitHub Releases; los ejecutables y las dependencias no se guardan en Git.
 
 ## Estructura
 
@@ -108,15 +144,16 @@ La aplicación de escritorio inicia su API local automáticamente. El modo naveg
 | Método | Ruta | Operación |
 | --- | --- | --- |
 | `GET` | `/api/pistas` | Listar pistas; acepta `?fase=Mezcla` |
+| `GET` | `/api/generos` | Listar los géneros guardados en la biblioteca |
 | `POST` | `/api/pistas` | Crear una pista |
 | `PUT` | `/api/pistas/:id` | Actualizar una pista |
 | `DELETE` | `/api/pistas/:id` | Eliminar una pista y su copia de audio |
 
-Los campos son `titulo`, `artista`, `genero`, `fase`, `calificacion` y `comentario`. Para adjuntar audio, envía `multipart/form-data` con el campo `archivoAudio`. Las operaciones sin archivo también aceptan JSON.
+`titulo` es opcional; al omitirse o quedar vacío en una pista nueva se toma el nombre original del archivo adjunto o **Sin título** si no hay audio. `nombreAudio` es un metadato gestionado por el servidor y no un campo editable de la solicitud. Los campos de entrada son `titulo`, `artista`, `genero`, `fase`, `calificacion` y `comentario`. Para adjuntar audio, envía `multipart/form-data` con el campo `archivoAudio`. Las operaciones sin archivo también aceptan JSON.
 
 ## Datos y documentación
 
-En Windows, los datos se guardan en `%LOCALAPPDATA%\EstudioHiro`. Cada instalación comienza con su propia biblioteca; el repositorio no incluye canciones, bases de datos ni credenciales.
+En Windows, los datos se guardan en `%LOCALAPPDATA%\EstudioHiro`. Una instalación nueva en otro usuario o equipo comienza con una biblioteca vacía; una actualización en el mismo usuario conserva la biblioteca existente. El repositorio no incluye canciones, bases de datos ni credenciales.
 
 - [Datos locales, configuración y copias de seguridad](docs/datos-locales.md)
 - [Guía para contribuir](CONTRIBUTING.md)
