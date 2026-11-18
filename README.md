@@ -25,7 +25,28 @@ Una vez instalada, la aplicación funciona sin conexión a internet y guarda la 
 
 ## Instalar en Windows
 
+### Probar esta feature
+
+Esta rama, `feature/generos-filtros-reproductor`, incluye el catálogo de géneros con sugerencias, los filtros laterales y el nuevo reproductor. Parte de `dev` y todavía no está integrada en la versión estable.
+
+El instalador de prueba generado en el equipo de desarrollo está en:
+
+```text
+release-local-feature-generos/Gestor de Tracks Setup 1.2.0.exe
+```
+
+1. Si ya utilizas la aplicación, sigue los pasos de [actualización y respaldo](#actualizar-conservando-tu-biblioteca) antes de instalar.
+2. Ejecuta el instalador de prueba y completa la instalación.
+3. Abre **Gestor de Tracks** desde el menú Inicio o su acceso directo.
+4. Comprueba tus pistas anteriores y prueba las sugerencias de género, los filtros y el reproductor.
+
+Este `.exe` es una compilación local de prueba y no está adjunto a GitHub Releases. Si descargaste el código de esta rama, puedes [generar el instalador de la feature](#generar-el-instalador-de-la-feature) o abrir la aplicación con `npm start`. La compilación de prueba conserva por ahora el número interno **1.2.0**; identifícala por su carpeta `release-local-feature-generos`.
+
+### Descargar la versión estable
+
 [**Descargar Gestor de Tracks 1.2.0 para Windows (.exe)**](https://github.com/Hirokinng/gestor-de-tracks/releases/download/v1.2.0/Gestor.de.Tracks.Setup.1.2.0.exe)
+
+Este enlace descarga la versión estable anterior, que todavía no incluye las mejoras de esta feature.
 
 1. Descarga `Gestor.de.Tracks.Setup.1.2.0.exe` desde el enlace anterior o desde [GitHub Releases](https://github.com/Hirokinng/gestor-de-tracks/releases/latest).
 2. Ejecuta el instalador y completa la instalación.
@@ -33,6 +54,19 @@ Una vez instalada, la aplicación funciona sin conexión a internet y guarda la 
 4. Crea tu primera pista y adjunta un audio desde la aplicación.
 
 La aplicación instalada incluye su entorno de ejecución: para utilizarla solo necesitas Windows. No requiere instalar Node.js, npm o Git, abrir una terminal ni configurar una base de datos.
+
+## Actualizar conservando tu biblioteca
+
+Al actualizar desde la versión **1.2.0 con SQLite**, se conservan tus pistas y proyectos, audios, fases, comentarios y calificaciones. La biblioteca se guarda fuera de la carpeta de instalación, en `%LOCALAPPDATA%\EstudioHiro`, y la feature reutiliza esa misma ubicación para el mismo usuario de Windows. Los géneros de tus pistas existentes aparecen automáticamente en las sugerencias y los filtros.
+
+1. Cierra Gestor de Tracks antes de actualizar.
+2. Abre `%LOCALAPPDATA%` desde el Explorador de archivos y copia la carpeta completa `EstudioHiro` a otra ubicación como respaldo.
+3. Ejecuta el nuevo instalador. No necesitas desinstalar la versión anterior.
+4. Abre la aplicación y verifica tu biblioteca antes de continuar trabajando.
+
+El instalador actualiza la misma aplicación. La versión estable y la feature comparten la biblioteca por defecto. Si quieres probar con datos independientes, consulta [Bibliotecas de desarrollo](docs/datos-locales.md#bibliotecas-de-desarrollo). Si has configurado `ESTUDIO_HIRO_DATA_DIR`, conserva esa configuración y respalda la carpeta indicada por ella.
+
+Las versiones históricas con MongoDB requieren un proceso de migración distinto: consulta [Versiones anteriores](docs/datos-locales.md#versiones-anteriores).
 
 ## Uso de la aplicación
 
@@ -42,8 +76,6 @@ La aplicación instalada incluye su entorno de ejecución: para utilizarla solo 
 - Usa la búsqueda para encontrar tus sesiones y edítalas o elimínalas desde el catálogo.
 - Marca géneros en la barra lateral para filtrar tus pistas. Puedes combinarlos con la búsqueda y restablecerlos con **Limpiar**.
 - Al guardar una pista con un género nuevo, este queda disponible como sugerencia para las siguientes sesiones.
-
-Estas mejoras están en la rama `feature/generos-filtros-reproductor`, basada en `dev`. El instalador publicado **1.2.0** corresponde a la versión estable anterior; para probar las mejoras de esta rama utiliza `npm start` desde el código.
 
 Los cambios se guardan en tu equipo. Al cerrar y volver a abrir la aplicación, recuperas tu biblioteca. Los audios que adjuntas se copian a la carpeta de datos de la aplicación; conserva un [respaldo de la biblioteca](docs/datos-locales.md#respaldar-y-restaurar) para trasladarla a otro equipo.
 
@@ -76,6 +108,16 @@ npm run build
 El instalador generado se puede copiar a otro equipo Windows para instalar la aplicación sin descargar el código ni sus dependencias por separado. Los ejecutables no se incluyen en el repositorio de código.
 
 > En PowerShell, si una política impide ejecutar `npm.ps1`, utiliza `npm.cmd` en los comandos anteriores.
+
+### Generar el instalador de la feature
+
+Con el código de `feature/generos-filtros-reproductor` y las dependencias instaladas, ejecuta:
+
+```bash
+npm run build -- --config.directories.output=release-local-feature-generos
+```
+
+El instalador se genera en `release-local-feature-generos/Gestor de Tracks Setup 1.2.0.exe`, separado del instalador estable que puedas conservar en `release-local-1.2.0/`.
 
 ### Comandos de desarrollo
 
@@ -123,7 +165,7 @@ Los campos son `titulo`, `artista`, `genero`, `fase`, `calificacion` y `comentar
 
 ## Datos y documentación
 
-En Windows, los datos se guardan en `%LOCALAPPDATA%\EstudioHiro`. Cada instalación comienza con su propia biblioteca; el repositorio no incluye canciones, bases de datos ni credenciales.
+En Windows, los datos se guardan en `%LOCALAPPDATA%\EstudioHiro`. Una instalación nueva en otro usuario o equipo comienza con una biblioteca vacía; una actualización en el mismo usuario conserva la biblioteca existente. El repositorio no incluye canciones, bases de datos ni credenciales.
 
 - [Datos locales, configuración y copias de seguridad](docs/datos-locales.md)
 - [Guía para contribuir](CONTRIBUTING.md)
