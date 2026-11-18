@@ -15,7 +15,7 @@ En otros sistemas se usa `$XDG_DATA_HOME/EstudioHiro` o `~/.local/share/EstudioH
 
 Al añadir un audio, la aplicación guarda una copia y conserva el original. Al reemplazar o eliminar una pista, elimina únicamente la copia que gestiona. Si la operación falla, conserva el audio anterior.
 
-La biblioteca se guarda fuera de la carpeta de instalación y se conserva al actualizar. El servidor escucha en `127.0.0.1`; la aplicación de escritorio elige un puerto disponible y permite una sola instancia.
+La biblioteca se guarda fuera de la carpeta de instalación y se conserva al actualizar. Al abrir Gestor de Tracks desde su acceso directo, la aplicación inicia automáticamente su servicio local y lo cierra al salir. Este servicio escucha en `127.0.0.1`, elige un puerto disponible y permite una sola instancia. No necesitas iniciar un servidor manualmente.
 
 ## Respaldar y restaurar
 
@@ -32,7 +32,7 @@ Puedes definir `ESTUDIO_HIRO_DATA_DIR` con una ruta absoluta para mantener una b
 
 ```powershell
 $env:ESTUDIO_HIRO_DATA_DIR = Join-Path $PWD '.tmp-ui/biblioteca-desarrollo'
-npm run dev
+npm start
 ```
 
 La aplicación no lee archivos `.env`. `PORT` permite cambiar el puerto del modo navegador; el valor predeterminado es `3000`.

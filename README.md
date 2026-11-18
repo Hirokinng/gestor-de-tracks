@@ -2,9 +2,9 @@
   <img src="public/icon.png" alt="Icono de Gestor de Tracks" width="96" height="96">
   <h1>Gestor de Tracks</h1>
   <p><strong>Tu biblioteca de sesiones, de la composición al máster.</strong></p>
-  <p>Organiza pistas, escucha tus audios y sigue el avance de cada proyecto musical desde una aplicación local.</p>
-  <p><strong>Electron 41</strong> · <strong>Node.js 24+</strong> · <strong>Express 5</strong> · <strong>SQLite</strong></p>
-  <p><a href="#empezar">Empezar</a> · <a href="#funciones">Funciones</a> · <a href="#estructura">Estructura</a> · <a href="docs/datos-locales.md">Datos y respaldos</a></p>
+  <p>Organiza pistas, escucha tus audios y sigue el avance de cada proyecto musical desde una aplicación de escritorio para Windows.</p>
+  <p><strong>Aplicación de escritorio para Windows</strong> · <strong>Biblioteca local</strong> · <strong>Uso sin conexión</strong></p>
+  <p><a href="#instalar-en-windows">Instalar en Windows</a> · <a href="#funciones">Funciones</a> · <a href="#estructura">Estructura</a> · <a href="docs/datos-locales.md">Datos y respaldos</a></p>
 </div>
 
 ![Catálogo de Gestor de Tracks con una sesión de ejemplo](docs/images/catalogo.png)
@@ -19,30 +19,60 @@
 - **Biblioteca local:** SQLite y copias de audio independientes para cada usuario y equipo.
 - **Interfaz en español:** tema oscuro, acentos naranja y diálogos con navegación por teclado.
 
-La aplicación funciona sin servicios externos durante su uso. La instalación de dependencias y la compilación pueden necesitar internet.
+Una vez instalada, la aplicación funciona sin conexión a internet y guarda la biblioteca en tu equipo. Se abre en su propia ventana y gestiona automáticamente su servicio local.
 
-## Empezar
+## Instalar en Windows
 
-Necesitas **Node.js 24 o posterior**, npm y Git. La aplicación de escritorio y su instalador están orientados a Windows.
+El formato de distribución es un instalador `.exe`. **Todavía no hay un instalador publicado en [GitHub Releases](https://github.com/Hirokinng/gestor-de-tracks/releases)**; por ahora puedes generarlo desde el código siguiendo los pasos de la siguiente sección.
 
-Clona este repositorio desde su botón **Code**, abre la carpeta descargada y ejecuta:
+Si ya tienes el instalador:
+
+1. Ejecuta `Gestor de Tracks Setup 1.2.0.exe` y completa la instalación.
+2. Abre **Gestor de Tracks** desde el menú Inicio o su acceso directo.
+3. Crea tu primera pista y adjunta un audio desde la aplicación.
+
+La aplicación instalada incluye su entorno de ejecución: para utilizarla solo necesitas Windows. No requiere instalar Node.js, npm o Git, abrir una terminal ni configurar una base de datos.
+
+### Generar el instalador desde el código
+
+Este paso requiere **Windows, Node.js 24 o posterior y npm**, además de conexión a internet para descargar las dependencias y herramientas de compilación.
+
+1. Descarga y extrae el código desde **Code → Download ZIP**, o clona el repositorio con Git.
+2. Abre una terminal en la carpeta del proyecto y ejecuta:
+
+```bash
+npm ci
+npm run build
+```
+
+3. Encontrarás el instalador en `release-local-1.2.0/Gestor de Tracks Setup 1.2.0.exe`.
+4. Ejecútalo y abre **Gestor de Tracks** desde el menú Inicio.
+
+El instalador generado se puede copiar a otro equipo Windows para instalar la aplicación sin descargar el código ni sus dependencias por separado. Los ejecutables no se incluyen en el repositorio de código.
+
+> En PowerShell, si una política impide ejecutar `npm.ps1`, utiliza `npm.cmd` en los comandos anteriores.
+
+## Uso de la aplicación
+
+- Crea una pista con su título, artista y género.
+- Adjunta un audio para escucharlo desde tu biblioteca.
+- Actualiza la fase de producción, la valoración y los comentarios a medida que avances.
+- Usa la búsqueda para encontrar tus sesiones y edítalas o elimínalas desde el catálogo.
+
+Los cambios se guardan en tu equipo. Al cerrar y volver a abrir la aplicación, recuperas tu biblioteca. Los audios que adjuntas se copian a la carpeta de datos de la aplicación; conserva un [respaldo de la biblioteca](docs/datos-locales.md#respaldar-y-restaurar) para trasladarla a otro equipo.
+
+## Desarrollo
+
+Para abrir la ventana de escritorio directamente desde el código, sin instalarla:
 
 ```bash
 npm ci
 npm start
 ```
 
-Para abrir la aplicación en el navegador:
+El modo navegador es una opción de desarrollo. Puedes iniciarlo con `npm run dev` y visitar `http://127.0.0.1:3000`. Consulta la [guía para contribuir](CONTRIBUTING.md) para trabajar en el proyecto y ejecutar las pruebas.
 
-```bash
-npm run dev
-```
-
-Visita **http://127.0.0.1:3000**. No necesitas configurar una base de datos ni crear un archivo `.env`.
-
-> En PowerShell, si una política impide ejecutar `npm.ps1`, utiliza `npm.cmd` en los comandos anteriores.
-
-## Comandos
+### Comandos de desarrollo
 
 | Comando | Descripción |
 | --- | --- |
@@ -72,7 +102,7 @@ gestor-de-tracks/
 └── package.json         # Dependencias, comandos y empaquetado
 ```
 
-El navegador y la ventana de Electron consumen la misma API local. `server.js` coordina las solicitudes, `models/Pista.js` valida los datos y `storage.js` los guarda en SQLite. Los audios se almacenan aparte, en la carpeta de datos del usuario.
+La aplicación de escritorio inicia su API local automáticamente. El modo navegador de desarrollo consume esa misma API. `server.js` coordina las solicitudes, `models/Pista.js` valida los datos y `storage.js` los guarda en SQLite. Los audios se almacenan aparte, en la carpeta de datos del usuario.
 
 ## API local
 
