@@ -23,34 +23,14 @@ Una vez instalada, la aplicación funciona sin conexión a internet y guarda la 
 
 ## Instalar en Windows
 
-El formato de distribución es un instalador `.exe`. **Todavía no hay un instalador publicado en [GitHub Releases](https://github.com/Hirokinng/gestor-de-tracks/releases)**; por ahora puedes generarlo desde el código siguiendo los pasos de la siguiente sección.
+[**Descargar Gestor de Tracks 1.2.0 para Windows (.exe)**](https://github.com/Hirokinng/gestor-de-tracks/releases/download/v1.2.0/Gestor.de.Tracks.Setup.1.2.0.exe)
 
-Si ya tienes el instalador:
-
-1. Ejecuta `Gestor de Tracks Setup 1.2.0.exe` y completa la instalación.
-2. Abre **Gestor de Tracks** desde el menú Inicio o su acceso directo.
-3. Crea tu primera pista y adjunta un audio desde la aplicación.
+1. Descarga `Gestor.de.Tracks.Setup.1.2.0.exe` desde el enlace anterior o desde [GitHub Releases](https://github.com/Hirokinng/gestor-de-tracks/releases/latest).
+2. Ejecuta el instalador y completa la instalación.
+3. Abre **Gestor de Tracks** desde el menú Inicio o su acceso directo.
+4. Crea tu primera pista y adjunta un audio desde la aplicación.
 
 La aplicación instalada incluye su entorno de ejecución: para utilizarla solo necesitas Windows. No requiere instalar Node.js, npm o Git, abrir una terminal ni configurar una base de datos.
-
-### Generar el instalador desde el código
-
-Este paso requiere **Windows, Node.js 24 o posterior y npm**, además de conexión a internet para descargar las dependencias y herramientas de compilación.
-
-1. Descarga y extrae el código desde **Code → Download ZIP**, o clona el repositorio con Git.
-2. Abre una terminal en la carpeta del proyecto y ejecuta:
-
-```bash
-npm ci
-npm run build
-```
-
-3. Encontrarás el instalador en `release-local-1.2.0/Gestor de Tracks Setup 1.2.0.exe`.
-4. Ejecútalo y abre **Gestor de Tracks** desde el menú Inicio.
-
-El instalador generado se puede copiar a otro equipo Windows para instalar la aplicación sin descargar el código ni sus dependencias por separado. Los ejecutables no se incluyen en el repositorio de código.
-
-> En PowerShell, si una política impide ejecutar `npm.ps1`, utiliza `npm.cmd` en los comandos anteriores.
 
 ## Uso de la aplicación
 
@@ -71,6 +51,25 @@ npm start
 ```
 
 El modo navegador es una opción de desarrollo. Puedes iniciarlo con `npm run dev` y visitar `http://127.0.0.1:3000`. Consulta la [guía para contribuir](CONTRIBUTING.md) para trabajar en el proyecto y ejecutar las pruebas.
+
+### Generar el instalador desde el código
+
+Este paso requiere **Windows, Node.js 24 o posterior y npm**, además de conexión a internet para descargar las dependencias y herramientas de compilación.
+
+1. Descarga y extrae el código desde **Code → Download ZIP**, o clona el repositorio con Git.
+2. Abre una terminal en la carpeta del proyecto y ejecuta:
+
+```bash
+npm ci
+npm run build
+```
+
+3. Encontrarás el instalador en `release-local-1.2.0/Gestor de Tracks Setup 1.2.0.exe`.
+4. Ejecútalo y abre **Gestor de Tracks** desde el menú Inicio.
+
+El instalador generado se puede copiar a otro equipo Windows para instalar la aplicación sin descargar el código ni sus dependencias por separado. Los ejecutables no se incluyen en el repositorio de código.
+
+> En PowerShell, si una política impide ejecutar `npm.ps1`, utiliza `npm.cmd` en los comandos anteriores.
 
 ### Comandos de desarrollo
 
