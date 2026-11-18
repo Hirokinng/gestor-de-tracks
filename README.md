@@ -25,33 +25,30 @@ Una vez instalada, la aplicación funciona sin conexión a internet y guarda la 
 
 ## Instalar en Windows
 
-### Probar esta feature
+### Descargar la versión 1.3.0
 
-Esta rama, `feature/generos-filtros-reproductor`, incluye el catálogo de géneros con sugerencias, los filtros laterales y el nuevo reproductor. Parte de `dev` y todavía no está integrada en la versión estable.
+[**Descargar Gestor de Tracks 1.3.0 para Windows (.exe)**](https://github.com/Hirokinng/gestor-de-tracks/releases/download/v1.3.0/Gestor.de.Tracks.Setup.1.3.0.exe)
 
-El instalador de prueba generado en el equipo de desarrollo está en:
+La **1.3.0** incluye el catálogo de géneros con sugerencias, los filtros laterales y el nuevo reproductor. Está publicada como versión de pruebas de la rama `feature/generos-filtros-reproductor`, basada en `dev`, y todavía no está integrada en `main`. Consulta sus [notas y archivos de descarga](https://github.com/Hirokinng/gestor-de-tracks/releases/tag/v1.3.0).
+
+El instalador generado desde el código de esta versión se encuentra en:
 
 ```text
-release-local-feature-generos/Gestor de Tracks Setup 1.2.0.exe
+release-local-1.3.0/Gestor de Tracks Setup 1.3.0.exe
 ```
 
 1. Si ya utilizas la aplicación, sigue los pasos de [actualización y respaldo](#actualizar-conservando-tu-biblioteca) antes de instalar.
-2. Ejecuta el instalador de prueba y completa la instalación.
+2. Descarga `Gestor.de.Tracks.Setup.1.3.0.exe` desde el enlace anterior, ejecútalo y completa la instalación.
 3. Abre **Gestor de Tracks** desde el menú Inicio o su acceso directo.
 4. Comprueba tus pistas anteriores y prueba las sugerencias de género, los filtros y el reproductor.
 
-Este `.exe` es una compilación local de prueba y no está adjunto a GitHub Releases. Si descargaste el código de esta rama, puedes [generar el instalador de la feature](#generar-el-instalador-de-la-feature) o abrir la aplicación con `npm start`. La compilación de prueba conserva por ahora el número interno **1.2.0**; identifícala por su carpeta `release-local-feature-generos`.
+El instalador incluye el entorno de ejecución. Si prefieres trabajar con el código, puedes [generar el instalador](#generar-el-instalador-desde-el-código) o abrir la aplicación con `npm start`.
 
-### Descargar la versión estable
+### Versión estable anterior: 1.2.0
 
 [**Descargar Gestor de Tracks 1.2.0 para Windows (.exe)**](https://github.com/Hirokinng/gestor-de-tracks/releases/download/v1.2.0/Gestor.de.Tracks.Setup.1.2.0.exe)
 
 Este enlace descarga la versión estable anterior, que todavía no incluye las mejoras de esta feature.
-
-1. Descarga `Gestor.de.Tracks.Setup.1.2.0.exe` desde el enlace anterior o desde [GitHub Releases](https://github.com/Hirokinng/gestor-de-tracks/releases/latest).
-2. Ejecuta el instalador y completa la instalación.
-3. Abre **Gestor de Tracks** desde el menú Inicio o su acceso directo.
-4. Crea tu primera pista y adjunta un audio desde la aplicación.
 
 La aplicación instalada incluye su entorno de ejecución: para utilizarla solo necesitas Windows. No requiere instalar Node.js, npm o Git, abrir una terminal ni configurar una base de datos.
 
@@ -102,22 +99,12 @@ npm ci
 npm run build
 ```
 
-3. Encontrarás el instalador en `release-local-1.2.0/Gestor de Tracks Setup 1.2.0.exe`.
+3. Encontrarás el instalador en `release-local-1.3.0/Gestor de Tracks Setup 1.3.0.exe`.
 4. Ejecútalo y abre **Gestor de Tracks** desde el menú Inicio.
 
 El instalador generado se puede copiar a otro equipo Windows para instalar la aplicación sin descargar el código ni sus dependencias por separado. Los ejecutables no se incluyen en el repositorio de código.
 
 > En PowerShell, si una política impide ejecutar `npm.ps1`, utiliza `npm.cmd` en los comandos anteriores.
-
-### Generar el instalador de la feature
-
-Con el código de `feature/generos-filtros-reproductor` y las dependencias instaladas, ejecuta:
-
-```bash
-npm run build -- --config.directories.output=release-local-feature-generos
-```
-
-El instalador se genera en `release-local-feature-generos/Gestor de Tracks Setup 1.2.0.exe`, separado del instalador estable que puedas conservar en `release-local-1.2.0/`.
 
 ### Comandos de desarrollo
 
@@ -128,9 +115,10 @@ El instalador se genera en `release-local-feature-generos/Gestor de Tracks Setup
 | `npm run test:api` | Probar validación, SQLite, audios, reinicios y aislamiento entre bibliotecas |
 | `npm run test:ui` | Probar la interfaz en Electron con una API simulada y sin peticiones externas |
 | `npm run build` | Generar el instalador de Windows con electron-builder |
+| `npm run verify:release` | Verificar que la versión, el instalador y su enlace de descarga en README coincidan |
 | `npm run test:desktop` | Probar la aplicación empaquetada; requiere compilar primero |
 
-El instalador se genera en `release-local-1.2.0/`. Los ejecutables y las dependencias no se guardan en Git.
+El instalador se genera en `release-local-1.3.0/`. Los ejecutables se distribuyen por GitHub Releases; los ejecutables y las dependencias no se guardan en Git.
 
 ## Estructura
 

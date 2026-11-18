@@ -28,7 +28,7 @@ La restauración reemplaza la biblioteca de destino; no combina catálogos. Copi
 
 ## Actualizar desde la versión 1.2.0
 
-La feature `generos-filtros-reproductor` reutiliza la biblioteca SQLite de la versión 1.2.0. Conserva las pistas, referencias a los audios, fases, comentarios y calificaciones; al abrirla, crea el catálogo de géneros a partir de las pistas existentes sin reescribirlas ni mover sus audios.
+La versión **1.3.0**, desarrollada en `feature/generos-filtros-reproductor`, reutiliza la biblioteca SQLite de la versión 1.2.0. Conserva las pistas, referencias a los audios, fases, comentarios y calificaciones; al abrirla, crea el catálogo de géneros a partir de las pistas existentes sin reescribirlas ni mover sus audios.
 
 Antes de instalar, cierra la aplicación y copia la carpeta completa `%LOCALAPPDATA%\EstudioHiro` a una ubicación de respaldo. Después ejecuta el nuevo instalador y abre Gestor de Tracks desde su acceso directo. No hace falta desinstalar la versión anterior.
 

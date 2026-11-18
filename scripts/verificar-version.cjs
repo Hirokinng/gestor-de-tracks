@@ -1,0 +1,15 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const assert = require('node:assert/strict');
+const raiz = path.join(__dirname, '..');
+const config = require('../package.json');
+const lock = require('../package-lock.json');
+const readme = fs.readFileSync(path.join(raiz, 'README.md'), 'utf8');
+const version = config.version;
+const enlace = `https://github.com/Hirokinng/gestor-de-tracks/releases/download/v${version}/Gestor.de.Tracks.Setup.${version}.exe`;
+assert.equal(lock.version, version, 'La versión raíz del lockfile debe coincidir con package.json');
+assert.equal(lock.packages[''].version, version, 'La versión del paquete raíz del lockfile debe coincidir');
+assert.equal(config.build.directories.output, `release-local-${version}`, 'Actualiza la carpeta de salida del instalador');
+assert.ok(readme.includes(`](${enlace})`), 'Actualiza el README con el enlace directo del instalador de la nueva versión');
+assert.ok(readme.includes(`release-local-${version}/Gestor de Tracks Setup ${version}.exe`), 'Actualiza la ruta del instalador en el README');
+console.log(`OK versión ${version}: package.json, lockfile, carpeta del instalador y enlace de descarga en README`);
