@@ -15,7 +15,7 @@ let win;
 app.whenReady().then(async () => {
     try {
         const config = require('../package.json');
-        const archivo = path.join(__dirname, '..', config.build.directories.output, 'win-unpacked/resources/app.asar');
+        const archivo = path.join(__dirname, '..', process.env.ESTUDIO_HIRO_BUILD_DIR || config.build.directories.output, 'win-unpacked/resources/app.asar');
         const { iniciarServidor } = require(path.join(archivo, 'server.js'));
         const abrir = async () => {
             server = iniciarServidor({ dataDir: path.join(dataDir, 'biblioteca') });
@@ -41,13 +41,14 @@ app.whenReady().then(async () => {
         await win.loadURL(base);
         await esperar("document.getElementById('estadoPistas').textContent === '0 de 0 pistas'");
         await ejecutar(`nuevaPista();
-            for (const [id, valor] of Object.entries({titulo: 'Sesión local', artista: 'Artista de prueba', genero: 'Rock', fase: 'Mezcla', calificacion: '4', comentario: 'Grabada sin internet'})) document.getElementById(id).value = valor;
+            for (const [id, valor] of Object.entries({titulo: '', artista: 'Artista de prueba', genero: 'Rock', fase: 'Mezcla', calificacion: '4', comentario: 'Grabada sin internet'})) document.getElementById(id).value = valor;
             document.getElementById('btnGuardar').click();`);
         await esperar("document.querySelectorAll('[data-pista]').length === 1 && !document.getElementById('modalFormulario').open");
         await new Promise(resolve => setTimeout(resolve, 200));
         fs.writeFileSync(path.join(pruebas, 'desktop-local.png'), (await win.webContents.capturePage()).toPNG());
         const guardadas = await (await fetch(base + '/api/pistas')).json();
-        assert.equal(guardadas[0].titulo, 'Sesión local');
+        assert.equal(guardadas[0].titulo, 'Sin título');
+        assert.deepEqual(await (await fetch(base + '/api/generos')).json(), ['Rock']);
         await ejecutar("document.querySelector('[data-pista] button:nth-child(2)').click()");
         await esperar("document.getElementById('modalFormulario').open");
         assert.equal(await ejecutar("document.activeElement.id"), 'titulo');
@@ -63,6 +64,7 @@ app.whenReady().then(async () => {
         const restauradas = await (await fetch(base + '/api/pistas')).json();
         assert.equal(restauradas[0]._id, guardadas[0]._id);
         assert.equal(restauradas[0].comentario, 'Grabada sin internet');
+        assert.deepEqual(await (await fetch(base + '/api/generos')).json(), ['Rock']);
         assert.deepEqual(externos, []);
         console.log('OK aplicación empaquetada: SQLite en Electron, creación real, persistencia, diálogos, vista móvil y ninguna petición externa');
         win.destroy();

@@ -16,10 +16,12 @@ app.whenReady().then(async () => {
         sitio.use(express.json());
         let pistas = [{ _id: 'pista1', titulo: '<img src=x onerror="window.inyectado=true">', artista: 'Artista', genero: 'Rock', fase: 'Mezcla', calificacion: 4, comentario: 'Comentario original' }];
         let falloCarga = false;
+        let falloGeneros = false;
         let falloGuardar = true;
         let falloEliminar = true;
         let peticionesGuardar = 0;
         sitio.get('/api/pistas', (req, res) => falloCarga ? res.status(500).json({ error: 'Fallo simulado' }) : res.json(pistas));
+        sitio.get('/api/generos', (_req, res) => falloGeneros ? res.status(500).json({ error: 'Fallo simulado' }) : res.json(['Rock']));
         sitio.put('/api/pistas/:id', (req, res) => {
             peticionesGuardar++;
             setTimeout(() => falloGuardar ? res.status(400).json({ error: 'Datos rechazados de prueba' }) : res.json({ _id: req.params.id }), 250);
@@ -53,11 +55,17 @@ app.whenReady().then(async () => {
         assert.equal(await ejecutar('Boolean(window.inyectado)'), false);
         assert.equal(await ejecutar("document.querySelector('.card-title img')"), null);
         console.log('OK contenido seguro y carga inicial');
+        falloGeneros = true;
+        await ejecutar('obtenerGeneros()');
+        assert.equal(await ejecutar("document.getElementById('btnReintentarGeneros').hidden"), false);
+        falloGeneros = false;
+        await ejecutar('obtenerGeneros()');
+        assert.equal(await ejecutar("document.getElementById('btnReintentarGeneros').hidden"), true);
         await ejecutar("document.getElementById('btnNuevaPista').click()");
         await esperar("document.getElementById('modalFormulario').classList.contains('show') && document.activeElement.id === 'titulo'");
         await ejecutar("document.getElementById('btnGuardar').click()");
-        assert.equal(await ejecutar('document.activeElement.id'), 'titulo');
-        assert.equal(await ejecutar("document.getElementById('titulo').getAttribute('aria-invalid')"), 'true');
+        assert.equal(await ejecutar('document.activeElement.id'), 'artista');
+        assert.equal(await ejecutar("document.getElementById('artista').getAttribute('aria-invalid')"), 'true');
         assert.equal(peticionesGuardar, 0);
         console.log('OK validación vacía y foco al primer error');
         await ejecutar("document.querySelector('#modalFormulario .btn-secondary').click()");

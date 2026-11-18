@@ -1,14 +1,15 @@
 {
   "name": "gestor-de-tracks",
-  "version": "1.2.0",
+  "version": "1.3.2",
   "description": "Gestor de Tracks: biblioteca local de sesiones y audios",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "dev": "node server.js",
     "build": "electron-builder --win",
-    "test:api": "node tests/api.cjs",
-    "test:ui": "electron --no-sandbox tests/ui.cjs",
+    "verify:release": "node scripts/verificar-version.cjs",
+    "test:api": "node tests/api.cjs && node tests/generos.cjs",
+    "test:ui": "electron --no-sandbox tests/ui.cjs && electron --no-sandbox tests/generos-ui.cjs",
     "test:desktop": "electron --no-sandbox tests/desktop.cjs"
   },
   "keywords": [],
@@ -40,7 +41,7 @@
       "icon": "public/icon.ico"
     },
     "directories": {
-      "output": "release-local-1.2.0"
+      "output": "release-local-1.3.2"
     },
     "nsis": {
       "include": "build/installer.nsh",

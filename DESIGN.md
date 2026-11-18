@@ -45,6 +45,8 @@ Mantener la pila de sistema del frontmatter. Marca con peso 700; botones princip
 
 Contenedor y cuadrícula adaptable de los estilos locales: una columna en móvil, dos desde md y tres desde lg para las pistas. El documento controla el desplazamiento; los modales usan el comportamiento de los estilos locales. No fijar alturas al catálogo.
 
+El catálogo incorpora una barra lateral de géneros de 200px, separada por un borde del área de resultados. Sigue la referencia de filtros aportada por el usuario: casillas, nombres y cantidades. Desde 768px aparece a la izquierda; en pantallas menores se coloca antes del catálogo, en dos columnas y con desplazamiento para listas largas. Con la barra lateral se muestran dos tarjetas hasta 1399px y tres desde 1400px.
+
 ## Elevation & Depth
 
 Tarjetas con sombra 0 4px 6px rgba(0,0,0,0.3); cabecera con sombra 0 4px 12px rgba(0,0,0,0.5). No añadir capas decorativas.
@@ -56,6 +58,14 @@ Tarjetas de radio 6px; botones principales de radio 4px. Conservar las formas de
 ## Components
 
 `appEstudio.js` es el dueño del catálogo, filtros, validación y operaciones. Los diálogos usan StudioModal sobre dialog nativo y su gestión de foco; el código restaura el foco al origen y enfoca Cancelar al confirmar una eliminación. Los selectores de fase son nativos: el sistema operativo controla su menú. La búsqueda incluye un botón para limpiar. Los errores de formulario permanecen dentro del diálogo, junto a los campos cuando corresponde. El comentario crece al escribir y no se redimensiona manualmente. Los detalles se abren mediante un botón accesible por teclado, independiente del reproductor.
+
+El campo de género usa SugerenciasGenero en `public/generos.js`, compartido entre crear y editar: sugerencias propias con ancho del campo, lista acotada y entrada libre. La biblioteca conserva los géneros al eliminar la última pista que los utiliza. El reproductor compartido `crearReproductor` en `public/reproductor.js` sustituye los controles multimedia del navegador: botón circular, línea de avance con tiempos y volumen secundario. Solo reproduce un audio a la vez; los errores incluyen una explicación visible.
+
+Los tokens de estas superficies pertenecen a `:root` en `public/estudio-base.css` (modelo B, sin generación): colors.primary → --studio-accent; colors.surface → --studio-surface; colors.border → --studio-border; colors.focus → --studio-focus. Los consumen filtros, sugerencias y reproductor. Los estilos de la cabecera y los controles anteriores conservan su dueño en `public/index.html`.
+
+Las calificaciones del catálogo y del detalle comparten `crearCalificacion` en `public/appEstudio.js`: cinco estrellas SVG de 15px en tono neutro `--studio-muted`, rellenas según el valor, con la puntuación numérica al lado. Los iconos se dibujan localmente y no dependen de glifos emoji ni recursos externos. Son indicadores de lectura; la edición conserva el campo numérico de 1 a 5.
+
+El título de la pista se presenta como opcional, con una ayuda permanente que explica el uso del nombre del audio. Se conserva la entrada escrita libremente y la asignación automática se resuelve al guardar, sin sobrescribir lo que el usuario está escribiendo.
 
 ## Do's and Don'ts
 

@@ -16,6 +16,16 @@ function crearApp({ dataDir = directorioDatos() } = {}) {
             callback(null, randomUUID() + (/^\.[a-z0-9]{1,10}$/.test(extension) ? extension : ''));
         }
     }) });
+    function nombreOriginal(file) {
+        if (!file) return undefined;
+        let nombre = file.originalname;
+        // Busboy interpreta por defecto el nombre multipart como Latin-1; los navegadores lo envían en UTF-8.
+        if (Array.from(nombre).every(letra => letra.codePointAt(0) <= 255)) {
+            try { nombre = new TextDecoder('utf-8', { fatal: true }).decode(Buffer.from(nombre, 'latin1')); }
+            catch { /* Conserva nombres enviados explícitamente en Latin-1. */ }
+        }
+        return path.posix.basename(nombre.replaceAll('\\', '/')).replace(/[\u0000-\u001f\u007f]/g, '').normalize('NFC').trim() || 'Audio';
+    }
     function quitarArchivo(ruta) {
         if (!ruta || !ruta.startsWith('/uploads/')) return;
         const nombre = ruta.slice('/uploads/'.length);
@@ -29,20 +39,24 @@ function crearApp({ dataDir = directorioDatos() } = {}) {
     app.use('/uploads', express.static(biblioteca.uploadsDir, { fallthrough: false }));
     app.get('/estudio.html', (_req, res) => res.redirect(302, '/'));
     app.use(express.static(path.join(__dirname, 'public')));
+    app.get('/api/generos', (_req, res, next) => {
+        try { res.json(biblioteca.listarGeneros()); }
+        catch (error) { next(error); }
+    });
     app.get('/api/pistas', (req, res, next) => {
         try { res.json(biblioteca.listar(typeof req.query.fase === 'string' ? req.query.fase : undefined)); }
         catch (error) { next(error); }
     });
     app.post('/api/pistas', upload.single('archivoAudio'), (req, res, next) => {
         const ruta = req.file ? '/uploads/' + req.file.filename : null;
-        try { res.status(201).json(biblioteca.crear(req.body, ruta)); }
+        try { res.status(201).json(biblioteca.crear(req.body, ruta, nombreOriginal(req.file))); }
         catch (error) { quitarArchivo(ruta); next(error); }
     });
     app.put('/api/pistas/:id', upload.single('archivoAudio'), (req, res, next) => {
         const ruta = req.file ? '/uploads/' + req.file.filename : undefined;
         try {
             const anterior = biblioteca.obtener(req.params.id);
-            const pista = biblioteca.actualizar(req.params.id, req.body, ruta);
+            const pista = biblioteca.actualizar(req.params.id, req.body, ruta, nombreOriginal(req.file));
             if (!pista) {
                 quitarArchivo(ruta);
                 return res.status(404).json({ error: 'La pista ya no existe. Actualiza el catálogo.' });
