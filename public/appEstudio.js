@@ -52,8 +52,34 @@ async function obtenerPistas() {
     }
 }
 
-function estrellas(valor) {
-    return '⭐'.repeat(Math.max(0, Math.min(5, Math.floor(Number(valor) || 0))));
+function crearCalificacion(valor) {
+    const cantidad = Math.max(0, Math.min(5, Math.floor(Number(valor) || 0)));
+    const grupo = document.createElement('span');
+    grupo.className = 'valoracion';
+    grupo.setAttribute('role', 'img');
+    grupo.setAttribute('aria-label', `${cantidad} de 5`);
+    const iconos = document.createElement('span');
+    iconos.className = 'valoracion-iconos';
+    iconos.setAttribute('aria-hidden', 'true');
+    for (let indice = 0; indice < 5; indice++) {
+        const icono = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        icono.setAttribute('viewBox', '0 0 24 24');
+        icono.setAttribute('width', '15');
+        icono.setAttribute('height', '15');
+        icono.setAttribute('aria-hidden', 'true');
+        icono.setAttribute('focusable', 'false');
+        icono.classList.toggle('valoracion-llena', indice < cantidad);
+        const figura = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        figura.setAttribute('d', 'm12 3 2.78 5.63L21 9.54l-4.5 4.39 1.06 6.2L12 17.2l-5.56 2.93 1.06-6.2L3 9.54l6.22-.91Z');
+        icono.appendChild(figura);
+        iconos.appendChild(icono);
+    }
+    const numero = document.createElement('span');
+    numero.className = 'valoracion-numero';
+    numero.setAttribute('aria-hidden', 'true');
+    numero.textContent = `${cantidad}/5`;
+    grupo.append(iconos, numero);
+    return grupo;
 }
 
 function renderizarPistas(pistas) {
@@ -95,9 +121,10 @@ function renderizarPistas(pistas) {
             </article>`;
         for (const [selector, texto] of [
             ['.card-title', pista.titulo], ['.badge', pista.fase], ['.card-subtitle', pista.artista],
-            ['.genero', pista.genero || 'Sin género'], ['.calificacion', `Calificación: ${estrellas(pista.calificacion)}`],
+            ['.genero', pista.genero || 'Sin género'],
             ['.comentario', pista.comentario || '']
         ]) columna.querySelector(selector).textContent = texto;
+        columna.querySelector('.calificacion').append('Calificación: ', crearCalificacion(pista.calificacion));
         if (typeof pista.archivoAudio === 'string' && pista.archivoAudio.startsWith('/uploads/')) {
             columna.querySelector('.audio').appendChild(crearReproductor(pista));
         } else {
@@ -336,8 +363,9 @@ function verDetalle(id) {
     if (!pista) return;
     for (const [campo, valor] of Object.entries({
         detalleTitulo: pista.titulo, detalleArtista: pista.artista, detalleGenero: pista.genero || 'Sin género',
-        detalleFase: pista.fase, detalleCalificacion: estrellas(pista.calificacion), detalleComentario: pista.comentario || 'Sin comentario.'
+        detalleFase: pista.fase, detalleComentario: pista.comentario || 'Sin comentario.'
     })) document.getElementById(campo).textContent = valor;
+    document.getElementById('detalleCalificacion').replaceChildren(crearCalificacion(pista.calificacion));
     abrirModal(modalDetalle);
 }
 document.addEventListener('DOMContentLoaded', () => { obtenerPistas(); obtenerGeneros(); });

@@ -122,6 +122,11 @@ dialog.modal::backdrop { background: rgba(0,0,0,.65); }
 .reproductor-silencio:active { color: var(--studio-focus); }
 .reproductor-error { color: #ea868f; margin: 8px 0 0; font-size: .8rem; }
 .sin-audio { margin: 16px 0 0; }
+.valoracion { display: inline-flex; align-items: center; gap: 8px; vertical-align: middle; white-space: nowrap; }
+.valoracion-iconos { display: inline-flex; align-items: center; gap: 3px; color: var(--studio-muted); }
+.valoracion-iconos svg { display: block; flex: 0 0 auto; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linejoin: round; }
+.valoracion-iconos .valoracion-llena { fill: currentColor; }
+.valoracion-numero { color: var(--studio-muted); font-size: .8rem; font-variant-numeric: tabular-nums; }
 @media (min-width: 992px) and (max-width: 1399px) { .catalogo-resultados .col-lg-4 { width: 50%; } }
 @media (max-width: 767px) {
     .catalogo-layout { grid-template-columns: minmax(0, 1fr); gap: 20px; }

@@ -25,20 +25,20 @@ Una vez instalada, la aplicación funciona sin conexión a internet y guarda la 
 
 ## Instalar en Windows
 
-### Descargar la versión 1.3.0
+### Descargar la versión 1.3.1
 
-[**Descargar Gestor de Tracks 1.3.0 para Windows (.exe)**](https://github.com/Hirokinng/gestor-de-tracks/releases/download/v1.3.0/Gestor.de.Tracks.Setup.1.3.0.exe)
+[**Descargar Gestor de Tracks 1.3.1 para Windows (.exe)**](https://github.com/Hirokinng/gestor-de-tracks/releases/download/v1.3.1/Gestor.de.Tracks.Setup.1.3.1.exe)
 
-La **1.3.0** incluye el catálogo de géneros con sugerencias, los filtros laterales y el nuevo reproductor. Está publicada como versión de pruebas de la rama `feature/generos-filtros-reproductor`, basada en `dev`, y todavía no está integrada en `main`. Consulta sus [notas y archivos de descarga](https://github.com/Hirokinng/gestor-de-tracks/releases/tag/v1.3.0).
+La **1.3.1** sustituye las estrellas emoji por iconos SVG monocromos con puntuación numérica en el catálogo y el detalle. También incluye el catálogo de géneros con sugerencias, los filtros laterales y el nuevo reproductor. Está publicada como versión de pruebas de la rama `feature/generos-filtros-reproductor`, basada en `dev`, y todavía no está integrada en `main`. Consulta sus [notas y archivos de descarga](https://github.com/Hirokinng/gestor-de-tracks/releases/tag/v1.3.1).
 
 El instalador generado desde el código de esta versión se encuentra en:
 
 ```text
-release-local-1.3.0/Gestor de Tracks Setup 1.3.0.exe
+release-local-1.3.1/Gestor de Tracks Setup 1.3.1.exe
 ```
 
 1. Si ya utilizas la aplicación, sigue los pasos de [actualización y respaldo](#actualizar-conservando-tu-biblioteca) antes de instalar.
-2. Descarga `Gestor.de.Tracks.Setup.1.3.0.exe` desde el enlace anterior, ejecútalo y completa la instalación.
+2. Descarga `Gestor.de.Tracks.Setup.1.3.1.exe` desde el enlace anterior, ejecútalo y completa la instalación.
 3. Abre **Gestor de Tracks** desde el menú Inicio o su acceso directo.
 4. Comprueba tus pistas anteriores y prueba las sugerencias de género, los filtros y el reproductor.
 
@@ -99,7 +99,7 @@ npm ci
 npm run build
 ```
 
-3. Encontrarás el instalador en `release-local-1.3.0/Gestor de Tracks Setup 1.3.0.exe`.
+3. Encontrarás el instalador en `release-local-1.3.1/Gestor de Tracks Setup 1.3.1.exe`.
 4. Ejecútalo y abre **Gestor de Tracks** desde el menú Inicio.
 
 El instalador generado se puede copiar a otro equipo Windows para instalar la aplicación sin descargar el código ni sus dependencias por separado. Los ejecutables no se incluyen en el repositorio de código.
@@ -118,7 +118,7 @@ El instalador generado se puede copiar a otro equipo Windows para instalar la ap
 | `npm run verify:release` | Verificar que la versión, el instalador y su enlace de descarga en README coincidan |
 | `npm run test:desktop` | Probar la aplicación empaquetada; requiere compilar primero |
 
-El instalador se genera en `release-local-1.3.0/`. Los ejecutables se distribuyen por GitHub Releases; los ejecutables y las dependencias no se guardan en Git.
+El instalador se genera en `release-local-1.3.1/`. Los ejecutables se distribuyen por GitHub Releases; los ejecutables y las dependencias no se guardan en Git.
 
 ## Estructura
 

@@ -63,6 +63,8 @@ El campo de género usa SugerenciasGenero en `public/generos.js`, compartido ent
 
 Los tokens de estas superficies pertenecen a `:root` en `public/estudio-base.css` (modelo B, sin generación): colors.primary → --studio-accent; colors.surface → --studio-surface; colors.border → --studio-border; colors.focus → --studio-focus. Los consumen filtros, sugerencias y reproductor. Los estilos de la cabecera y los controles anteriores conservan su dueño en `public/index.html`.
 
+Las calificaciones del catálogo y del detalle comparten `crearCalificacion` en `public/appEstudio.js`: cinco estrellas SVG de 15px en tono neutro `--studio-muted`, rellenas según el valor, con la puntuación numérica al lado. Los iconos se dibujan localmente y no dependen de glifos emoji ni recursos externos. Son indicadores de lectura; la edición conserva el campo numérico de 1 a 5.
+
 ## Do's and Don'ts
 
 Conservar los datos introducidos al fallar una operación. Mantener dimensiones de botones mientras se guarda. Usar texto seguro para títulos, artistas y comentarios; no interpolarlos como HTML. Respetar movimiento reducido y barras de desplazamiento visibles. No usar alert, confirm ni prompt nativos.
